@@ -1572,7 +1572,7 @@ For example, switching to some Mac OS 9 icons:
 
 ```shell
 $ cd ~/.local/share/icons/
-$ git clone git@bitbucket.org:kdha200501/jacks-kde-icon-pack.git
+$ git clone git@github.com:kdha200501/jacks-kde-icon-pack.git
 ```
 
 *n.b.* credit goes to marcello-c ref: [link 1](https://www.deviantart.com/marcello-c/art/Classic-Mac-Style-Drives-for-OS-X-625109975) [link2](https://www.deviantart.com/marcello-c/art/Classic-Mac-Style-Folders-for-OS-X-624900831)
@@ -1654,7 +1654,7 @@ Using assets generously provided by Michael Feeney (ref: [link](https://www.figm
 
 ```shell
 $ cd ~/.local/share/aurorae/themes
-$ git clone git@bitbucket.org:kdha200501/jacks-kde-window-decoration.git
+$ git clone git@github.com:kdha200501/jacks-kde-window-decoration.git
 $ mv jacks-kde-window-decoration besothaiku
 ```
 
@@ -2057,7 +2057,7 @@ For example, switching to "Maia Transparent" and then modify menu item hover sta
 
 ```shell
 $ cd ~/.local/share/plasma/desktoptheme
-$ git clone git@bitbucket.org:kdha200501/jacks-kde-plasma-style.git
+$ git clone git@github.com:kdha200501/jacks-kde-plasma-style.git
 $ mv jacks-kde-plasma-style.git Maia_Transparent
 ```
 
