@@ -945,7 +945,7 @@ Add the following:
 
 ```sh
 #!/bin/bash
-xremap --watch ~/.xremap/config.json > /dev/null 2>&1
+~/.cargo/bin/xremap --watch ~/.xremap/config.json > /dev/null 2>&1
 ```
 
 > the `--watch` option tells xremap to watch for newly added keyboards and apply the same remapping
