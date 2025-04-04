@@ -964,6 +964,18 @@ $ sudo reboot
 
 
 
+##### Turn on number lock upon user log in
+
+Launch "System Settings"
+
+Go to "Keyboard" -> "Keyboard"
+
+- set "NumLock on startup" to "Turn on"
+
+
+
+
+
 ##### Remap shortcut for task switcher
 
 Launch "System Settings"
