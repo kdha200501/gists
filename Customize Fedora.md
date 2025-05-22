@@ -90,8 +90,6 @@ syntax on
 
 *Atom* is the most hack-able text editor
 
-- it's no longer under development
-
 
 
 ##### Install `nvm`
@@ -122,6 +120,10 @@ $ npm -v
 
 ##### Install *Atom*
 
+> [!WARNING]
+>
+> *Atom* is no longer under development and it can no longer be installed due to missing dependencies in *Fedora*. Skip the remaining steps and see *Pulsar* below
+
 Download `atom.x86_64.rpm` from *GitHub* (ref: [link](https://github.com/atom/atom/releases/tag/v1.60.0)) and install
 
 
@@ -146,6 +148,60 @@ $ git clone https://github.com/prettier/prettier-atom.git
 $ cd prettier-atom
 $ npm i
 $ npm audit fix --force
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Install *Pulsar*
+
+Download .rpm from *Pulsar* (ref: [link](https://pulsar-edit.dev/download.html#regular-releases)) and install
+
+Install `prettier-atom` and `atom-runner` from the package manager within *Pulsar*
+
+
+
+Aliases *Pulsar* as Atom
+
+```shell
+$ vim ~/.bashrc
+```
+
+Add
+
+```shell
+alias atom=pulsar
+```
+
+
+
+```shell
+$ touch ~/.local/share/applications/pulsar.desktop
+$ vim ~/.local/share/applications/pulsar.desktop
+```
+
+Copy and paste:
+
+```shell
+[Desktop Entry]
+Name=Atom
+Exec=pulsar %F
+Icon=pulsar
+Type=Application
+Categories=Development;
 ```
 
 
@@ -766,7 +822,7 @@ $ touch ~/.xremap/config.json
 $ atom ~/.xremap/config.json
 ```
 
-Add the following:
+Copy and paste:
 
 ```json
 {
@@ -887,7 +943,7 @@ Add the following:
     {
       "name": "Atom",
       "application": {
-        "only": "Atom"
+        "only": ["Pulsar", "Atom"]
       },
       "remap": {
         "Control-Shift-P": "Control-Alt-F",
@@ -912,9 +968,21 @@ Add the following:
       "remap": {
         "Control-G": "F3"
       }
+    },
+    {
+      "name": "Webstorm",
+      "application": {
+        "only": "jetbrains-webstorm"
+      },
+      "remap": {
+        "Super-C": "Control_L-Shift-C",
+        "Alt-KEY_RIGHTBRACE": "Control-Shift_L-KEY_PAGEDOWN",
+        "Alt-KEY_LEFTBRACE": "Control-Shift_L-KEY_PAGEUP"
+      }
     }
   ]
 }
+
 ```
 
 
