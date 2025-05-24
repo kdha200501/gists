@@ -616,7 +616,7 @@ $ mkdir -p ~/Downloads/facetimehd-color-profile
 $ cd ~/Downloads/facetimehd-color-profile
 $ mv ../bootcamp5.1.5769.zip ./
 $ unzip bootcamp5.1.5769.zip
-$ cd /BootCamp/Drivers/Apple
+$ cd ./BootCamp/Drivers/Apple
 $ unrar x AppleCamera64.exe
 
 $ dd bs=1 skip=1663920 count=33060 if=AppleCamera.sys of=9112_01XX.dat
