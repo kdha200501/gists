@@ -3980,6 +3980,28 @@ X-KDE-SubstituteUID=false
 
 
 
+# Install *Zoom*
+
+```shell
+$ sudo dnf install zoom_x86_64.rpm
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Install Signal
 
 ```shell
