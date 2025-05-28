@@ -1,0 +1,85 @@
+Subject: [PATCH] jacks-customizations: disable mouse over effect
+---
+Index: src/filewidgets/kfileplacesview.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/filewidgets/kfileplacesview.cpp b/src/filewidgets/kfileplacesview.cpp
+--- a/src/filewidgets/kfileplacesview.cpp	(revision 719e0b0031155ef83a2cf71d6d24114dea181353)
++++ b/src/filewidgets/kfileplacesview.cpp	(revision 9fb01f96c96e4e3c8a2954aece7415dca972dc0b)
+@@ -131,12 +131,12 @@
+         painter->setOpacity(painter->opacity() * 0.6);
+     }
+ 
+-    if (!m_showHoverIndication) {
+-        opt.state &= ~QStyle::State_MouseOver;
+-    }
++    // if (!m_showHoverIndication) {
++    //     opt.state &= ~QStyle::State_MouseOver;
++    // }
+ 
+     if (opt.state & QStyle::State_MouseOver) {
+-        if (index == m_hoveredHeaderArea) {
++        if (index == m_hoveredHeaderArea || !m_view->isDragging()) {
+             opt.state &= ~QStyle::State_MouseOver;
+         }
+     }
+@@ -1057,6 +1057,15 @@
+     return d->m_showAll;
+ }
+ 
++bool KFilePlacesView::isDragging() const
++{
++    // unfortunately, KIO does not support dropping on top of a place item (to move file/folder),
++    // so, there's no point of highlighting the place item when dragging
++    // return d->m_dragging;
++
++    return false;
++}
++
+ void KFilePlacesView::setShowAll(bool showAll)
+ {
+     KFilePlacesModel *placesModel = qobject_cast<KFilePlacesModel *>(model());
+Index: src/filewidgets/kfileplacesview.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/filewidgets/kfileplacesview.h b/src/filewidgets/kfileplacesview.h
+--- a/src/filewidgets/kfileplacesview.h	(revision 719e0b0031155ef83a2cf71d6d24114dea181353)
++++ b/src/filewidgets/kfileplacesview.h	(revision 9fb01f96c96e4e3c8a2954aece7415dca972dc0b)
+@@ -46,6 +46,7 @@
+      * @since 5.91
+      */
+     bool allPlacesShown() const;
++    bool isDragging() const;
+ 
+     /**
+      * If \a enabled is true, it is allowed dropping items
+Index: src/widgets/kfileitemdelegate.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/widgets/kfileitemdelegate.cpp b/src/widgets/kfileitemdelegate.cpp
+--- a/src/widgets/kfileitemdelegate.cpp	(revision 719e0b0031155ef83a2cf71d6d24114dea181353)
++++ b/src/widgets/kfileitemdelegate.cpp	(revision 9fb01f96c96e4e3c8a2954aece7415dca972dc0b)
+@@ -1138,7 +1138,7 @@
+ 
+     // Check if the item is being animated
+     // ========================================================================
+-    KIO::AnimationState *state = d->animationState(opt, index, view);
++    KIO::AnimationState *state = nullptr;
+     KIO::CachedRendering *cache = nullptr;
+     qreal progress = ((opt.state & QStyle::State_MouseOver) && index.column() == KDirModel::Name) ? 1.0 : 0.0;
+     const QPoint iconPos = d->iconPosition(opt);
+@@ -1322,6 +1322,8 @@
+         icon = d->applyHoverEffect(icon);
+     }
+ 
++    opt.state &= ~QStyle::State_MouseOver;
++
+     drawBackground(*painter, opt);
+     painter->drawPixmap(iconPos, icon);
+ 

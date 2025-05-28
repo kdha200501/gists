@@ -1,0 +1,87 @@
+Subject: [PATCH] jacks-customizations: include background when folder is dragged over
+---
+Index: containments/desktop/package/contents/ui/FolderItemDelegate.qml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/containments/desktop/package/contents/ui/FolderItemDelegate.qml b/containments/desktop/package/contents/ui/FolderItemDelegate.qml
+--- a/containments/desktop/package/contents/ui/FolderItemDelegate.qml	(revision 0742cd7b22bd29e7e1cece99f43e87f61c9961e5)
++++ b/containments/desktop/package/contents/ui/FolderItemDelegate.qml	(revision 058d4110ec9d06ae95a33f9a5d6a9e89254d723e)
+@@ -21,6 +21,8 @@
+ Item {
+     id: main
+ 
++    property Item parentItemReference
++
+     property int index:          model.index
+     property string name:        model.blank ? "" : model.display
+     property string nameWrapped: model.blank ? "" : model.displayWrapped
+@@ -375,7 +377,7 @@
+                         // get unloaded when items are dragged to a different
+                         // place on the desktop.
+                         visible: this === frameLoader.item
+-                        hovered: impl.iconAndLabelsShouldlookSelected
++                        hovered: impl.iconAndLabelsShouldlookSelected && parentItemReference.dragging && isDir
+                         pressed: model.selected
+                         active: Window.active
+                     }
+Index: containments/desktop/package/contents/ui/FolderView.qml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/containments/desktop/package/contents/ui/FolderView.qml b/containments/desktop/package/contents/ui/FolderView.qml
+--- a/containments/desktop/package/contents/ui/FolderView.qml	(revision 0742cd7b22bd29e7e1cece99f43e87f61c9961e5)
++++ b/containments/desktop/package/contents/ui/FolderView.qml	(revision 058d4110ec9d06ae95a33f9a5d6a9e89254d723e)
+@@ -89,6 +89,7 @@
+         dir.linkHere(sourceUrl);
+     }
+ 
++    // note, this is called by FolderViewDropArea.qml
+     function handleDragMove(x, y) {
+         var child = childAt(x, y);
+ 
+@@ -472,7 +473,7 @@
+             var leftEdge = Math.min(gridView.contentX, gridView.originX);
+ 
+             if (!item || item.blank) {
+-                if (gridView.hoveredItem && !root.containsDrag && (!dialog || !dialog.containsDrag) && !gridView.hoveredItem.popupDialog) {
++                if (!dragging && gridView.hoveredItem && !root.containsDrag && (!dialog || !dialog.containsDrag) && !gridView.hoveredItem.popupDialog) {
+                     gridView.hoveredItem = null;
+                 }
+             } else {
+@@ -760,6 +761,7 @@
+                 delegate: FolderItemDelegate {
+                     width: gridView.cellWidth
+                     height: gridView.cellHeight
++                    parentItemReference: main
+                 }
+ 
+                 onContentXChanged: {
+Index: containments/desktop/plugins/folder/foldermodel.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/containments/desktop/plugins/folder/foldermodel.cpp b/containments/desktop/plugins/folder/foldermodel.cpp
+--- a/containments/desktop/plugins/folder/foldermodel.cpp	(revision 0742cd7b22bd29e7e1cece99f43e87f61c9961e5)
++++ b/containments/desktop/plugins/folder/foldermodel.cpp	(revision 058d4110ec9d06ae95a33f9a5d6a9e89254d723e)
+@@ -282,7 +282,7 @@
+     QHash<int, QByteArray> roleNames;
+     roleNames[Qt::DisplayRole] = QByteArrayLiteral("display");
+     roleNames[Qt::DecorationRole] = QByteArrayLiteral("decoration");
+-    roleNames[BlankRole] = QByteArrayLiteral("blank");
++    roleNames[BlankRole] = QByteArrayLiteral("blank");// the item.blank alias
+     roleNames[SelectedRole] = QByteArrayLiteral("selected");
+     roleNames[IsDirRole] = QByteArrayLiteral("isDir");
+     roleNames[IsLinkRole] = QByteArrayLiteral("isLink");
+@@ -1428,7 +1428,7 @@
+     }
+ 
+     if (role == BlankRole) {
+-        return m_dragIndexes.contains(index);
++        return m_dragIndexes.contains(index);//ref source of truth for item.blank
+     } else if (role == SelectedRole) {
+         return m_selectionModel->isSelected(index);
+     } else if (role == IsDirRole) {

@@ -1,0 +1,267 @@
+Subject: [PATCH] jacks-customizations: add shortcuts
+---
+Index: containments/desktop/package/contents/ui/FolderView.qml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/containments/desktop/package/contents/ui/FolderView.qml b/containments/desktop/package/contents/ui/FolderView.qml
+--- a/containments/desktop/package/contents/ui/FolderView.qml	(revision 18bf58dce425964f9ed1a0390f1a9b3bd2924126)
++++ b/containments/desktop/package/contents/ui/FolderView.qml	(revision 0742cd7b22bd29e7e1cece99f43e87f61c9961e5)
+@@ -1001,13 +1001,13 @@
+                 Behavior on contentX { id: smoothX; enabled: false; SmoothedAnimation { velocity: 700 } }
+                 Behavior on contentY { id: smoothY; enabled: false; SmoothedAnimation { velocity: 700 } }
+ 
+-                Keys.onReturnPressed: event => {
+-                    if (event.modifiers === Qt.AltModifier) {
+-                        dir.openPropertiesDialog();
+-                    } else {
+-                        runOrCdSelected();
+-                    }
+-                }
++                //Keys.onReturnPressed: event => {
++                //    if (event.modifiers === Qt.AltModifier) {
++                //        dir.openPropertiesDialog();
++                //    } else {
++                //        runOrCdSelected();
++                //    }
++                //}
+ 
+                 Keys.onEnterPressed: event => Keys.returnPressed(event)
+ 
+@@ -1034,6 +1034,11 @@
+                         installAsEventFilterFor(gridView);
+                     }
+ 
++                    // convention over configuration, the convention is "on<Q_Signal name>"
++                    onOpen: {
++                        gridView.runOrCdSelected();
++                    }
++
+                     onDeleteFile: {
+                         dir.deleteSelected();
+                     }
+@@ -1042,6 +1047,10 @@
+                         rename();
+                     }
+ 
++                    onDuplicate: {
++                        dir.duplicateSelected();
++                    }
++
+                     onMoveToTrash: {
+                         const action = dir.action("trash");
+                         if (action && action.enabled) {
+@@ -1049,9 +1058,17 @@
+                         }
+                     }
+ 
++                    onViewProperties: {
++                        dir.openPropertiesDialog();
++                    }
++
+                     onCreateFolder: {
+                         model.createFolder();
+                     }
++
++                    onRunHome: {
++                        dir.runHome();
++                    }
+                 }
+ 
+                 Keys.onPressed: event => {
+Index: containments/desktop/plugins/folder/foldermodel.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/containments/desktop/plugins/folder/foldermodel.cpp b/containments/desktop/plugins/folder/foldermodel.cpp
+--- a/containments/desktop/plugins/folder/foldermodel.cpp	(revision 18bf58dce425964f9ed1a0390f1a9b3bd2924126)
++++ b/containments/desktop/plugins/folder/foldermodel.cpp	(revision 0742cd7b22bd29e7e1cece99f43e87f61c9961e5)
+@@ -879,6 +879,15 @@
+     });
+ }
+ 
++void FolderModel::runHome()
++{
++    QUrl url = QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::HomeLocation));auto job = new KIO::OpenUrlJob(url);
++    job->setUiDelegate(KIO::createDefaultJobUiDelegate(KJobUiDelegate::AutoHandlingEnabled, nullptr));
++    job->setShowOpenOrExecuteDialog(false);
++    job->setRunExecutables(false);
++    job->start();
++}
++
+ void FolderModel::rename(int row, const QString &name)
+ {
+     if (row < 0) {
+@@ -2225,6 +2234,36 @@
+     job->start();
+ }
+ 
++void FolderModel::duplicateSelected()
++{
++    if (!m_selectionModel->hasSelection()) {
++        return;
++    }
++
++    const QMimeDatabase db; // default constructors
++
++    for (const auto &originalURL : selectedUrls()) {
++        // The following source code are copied from the Dolphin file manager
++        const QString originalDirectoryPath = originalURL.adjusted(QUrl::RemoveFilename).path();
++        const QString originalFileName = originalURL.fileName();
++        QString extension = db.suffixForFileName(originalFileName);
++        QUrl duplicateURL = originalURL;
++
++        if (extension.isEmpty()) {
++            duplicateURL.setPath(originalDirectoryPath + i18nc("<filename> copy", "%1 copy", originalFileName));
++        } else {
++            extension = QLatin1String(".") + extension;
++            const QString originalFilenameWithoutExtension = originalFileName.chopped(extension.size());
++            const QString originalExtension = originalFileName.right(extension.size());
++            duplicateURL.setPath(originalDirectoryPath + i18nc("<filename> copy", "%1 copy", originalFilenameWithoutExtension) + originalExtension);
++        }
++
++        KIO::CopyJob *job = KIO::copyAs(originalURL, duplicateURL);
++        job->setAutoRename(true);
++        KIO::FileUndoManager::self()->recordCopyJob(job);
++    }
++}
++
+ void FolderModel::undo()
+ {
+     if (QAction *action = m_actionCollection.action(QStringLiteral("undo"))) {
+Index: containments/desktop/plugins/folder/foldermodel.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/containments/desktop/plugins/folder/foldermodel.h b/containments/desktop/plugins/folder/foldermodel.h
+--- a/containments/desktop/plugins/folder/foldermodel.h	(revision 18bf58dce425964f9ed1a0390f1a9b3bd2924126)
++++ b/containments/desktop/plugins/folder/foldermodel.h	(revision 0742cd7b22bd29e7e1cece99f43e87f61c9961e5)
+@@ -196,6 +196,7 @@
+ 
+     Q_INVOKABLE void run(int row);
+     Q_INVOKABLE void runSelected();
++    Q_INVOKABLE void runHome();
+     Q_INVOKABLE void showTarget();
+ 
+     Q_INVOKABLE void rename(int row, const QString &name);
+@@ -242,6 +243,7 @@
+     Q_INVOKABLE void copy();
+     Q_INVOKABLE void cut();
+     Q_INVOKABLE void deleteSelected();
++    Q_INVOKABLE void duplicateSelected();
+     Q_INVOKABLE void undo();
+     Q_INVOKABLE void refresh();
+     Q_INVOKABLE void createFolder();
+Index: containments/desktop/plugins/folder/shortcut.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/containments/desktop/plugins/folder/shortcut.cpp b/containments/desktop/plugins/folder/shortcut.cpp
+--- a/containments/desktop/plugins/folder/shortcut.cpp	(revision 18bf58dce425964f9ed1a0390f1a9b3bd2924126)
++++ b/containments/desktop/plugins/folder/shortcut.cpp	(revision 0742cd7b22bd29e7e1cece99f43e87f61c9961e5)
+@@ -25,28 +25,58 @@
+ 
+ bool ShortCut::eventFilter(QObject *obj, QEvent *e)
+ {
+-    if (e->type() == QEvent::KeyPress) {
+-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+-        const int keyInt = keyEvent->modifiers() & ~Qt::KeypadModifier | keyEvent->key();
+-        if (KStandardShortcut::deleteFile().contains(QKeySequence(keyInt))) {
+-            Q_EMIT deleteFile();
+-            return true;
+-        }
+-        if (KStandardShortcut::renameFile().contains(QKeySequence(keyInt))) {
+-            Q_EMIT renameFile();
+-            return true;
+-        }
+-        if (KStandardShortcut::moveToTrash().contains(QKeySequence(keyInt))) {
+-            Q_EMIT moveToTrash();
+-            return true;
+-        }
+-        if (KStandardShortcut::createFolder().contains(QKeySequence(keyInt))) {
+-            Q_EMIT createFolder();
+-            return true;
+-        }
+-    }
++
++  if (e->type() != QEvent::KeyPress) {
++      return QObject::eventFilter(obj, e);
++  }
++
++  QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
++  bool isContrl = keyEvent->modifiers() & Qt::ControlModifier;
++  bool isShift = keyEvent->modifiers() & Qt::ShiftModifier;
++
++  if (isContrl && isShift && keyEvent->key() == Qt::Key_N) {
++      Q_EMIT createFolder();
++      return true;
++  }
++
++  if (isContrl && isShift && keyEvent->key() == Qt::Key_H) {
++      Q_EMIT runHome();
++      return true;
++  }
++
++  if (isContrl && keyEvent->key() == Qt::Key_N) {
++      Q_EMIT runHome();
++      return true;
++  }
++
++  // The reactions to the following signals already checks for the presence of selection
++
++  if (isContrl && keyEvent->key() == Qt::Key_Down) {
++      Q_EMIT open();
++      return true;
++  }
++
++  if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
++      Q_EMIT renameFile();
++      return true;
++  }
++
++  if (isContrl && keyEvent->key() == Qt::Key_D) {
++      Q_EMIT duplicate();
++      return true;
++  }
++
++  if (isContrl && keyEvent->key() == Qt::Key_Backspace) {
++      Q_EMIT moveToTrash();
++      return true;
++  }
++
++  if (isContrl && keyEvent->key() == Qt::Key_I) {
++      Q_EMIT viewProperties();
++      return true;
++  }
+ 
+-    return QObject::eventFilter(obj, e);
++  return QObject::eventFilter(obj, e);
+ }
+ 
+ #include "moc_shortcut.cpp"
+Index: containments/desktop/plugins/folder/shortcut.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/containments/desktop/plugins/folder/shortcut.h b/containments/desktop/plugins/folder/shortcut.h
+--- a/containments/desktop/plugins/folder/shortcut.h	(revision 18bf58dce425964f9ed1a0390f1a9b3bd2924126)
++++ b/containments/desktop/plugins/folder/shortcut.h	(revision 0742cd7b22bd29e7e1cece99f43e87f61c9961e5)
+@@ -33,9 +33,13 @@
+ 
+ Q_SIGNALS:
+     void deleteFile();
++    void open();
+     void renameFile();
++    void duplicate();
+     void moveToTrash();
++    void viewProperties();
+     void createFolder();
++    void runHome();
+ 
+ protected:
+     bool eventFilter(QObject *obj, QEvent *e) override;

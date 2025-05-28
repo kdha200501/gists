@@ -1,6 +1,12 @@
 # Install wifi firmware
 
-The firmware for the (Broadcom) BCM4364 wifi chip is not included in the wifi driver. The firmware can be extracted when the iMac is running macOS Sonoma. Follow the tarball method on this guide ([link](https://wiki.t2linux.org/guides/wifi-bluetooth))
+The firmware for the (Broadcom) BCM4364 wifi chip is not included in the wifi driver. The firmware can be extracted when the iMac is running macOS Sonoma following the tarball method on the T2Linux guide (ref: [link](https://wiki.t2linux.org/guides/wifi-bluetooth)).
+
+> [!IMPORTANT]
+>
+> The outcome of the extraction is attached to this guide: [firmware.tar](bcm4364-firmware-extraction/firmware.tar)
+
+
 
 
 
@@ -46,11 +52,15 @@ There are drivers for the CS8409 sound chip and none has made it to the Linux ke
 
 
 
+
+
 ##### Install dependencies for `snd_hda_macbookpro`
 
 ```shell
 $ dnf install gcc kernel-devel make patch wget
 ```
+
+
 
 
 

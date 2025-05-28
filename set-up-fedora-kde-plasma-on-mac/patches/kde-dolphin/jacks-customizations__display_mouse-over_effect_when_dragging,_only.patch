@@ -1,0 +1,128 @@
+Subject: [PATCH] jacks-customizations: display mouse-over effect when dragging, only
+---
+Index: src/kitemviews/kitemlistcontroller.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/kitemviews/kitemlistcontroller.cpp b/src/kitemviews/kitemlistcontroller.cpp
+--- a/src/kitemviews/kitemlistcontroller.cpp	(revision 9564df00262d06d29601bf8b4d19d6b874fa2a72)
++++ b/src/kitemviews/kitemlistcontroller.cpp	(revision 86e5b368820af7d4d7455ccae039ba0714f127dc)
+@@ -857,6 +857,8 @@
+                 Q_EMIT itemHovered(index);
+             }
+ 
++            newHoveredWidget->setHighlighted(m_model->canEnterOnHover(index));
++
+             if (!m_autoActivationTimer->isActive() && m_autoActivationTimer->interval() >= 0 && m_model->canEnterOnHover(index)) {
+                 m_autoActivationTimer->setProperty("index", index);
+                 m_autoActivationTimer->start();
+Index: src/kitemviews/kitemlistwidget.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/kitemviews/kitemlistwidget.cpp b/src/kitemviews/kitemlistwidget.cpp
+--- a/src/kitemviews/kitemlistwidget.cpp	(revision 9564df00262d06d29601bf8b4d19d6b874fa2a72)
++++ b/src/kitemviews/kitemlistwidget.cpp	(revision 86e5b368820af7d4d7455ccae039ba0714f127dc)
+@@ -34,6 +34,7 @@
+     , m_selected(false)
+     , m_current(false)
+     , m_hovered(false)
++    , m_highlighted(false)
+     , m_expansionAreaHovered(false)
+     , m_alternateBackground(false)
+     , m_enabledSelectionToggle(false)
+@@ -145,7 +146,11 @@
+ 
+             QPainter pixmapPainter(m_hoverCache);
+             const QStyle::State activeState(isActiveWindow() && widget->hasFocus() ? QStyle::State_Active | QStyle::State_Enabled : 0);
+-            drawItemStyleOption(&pixmapPainter, widget, activeState | QStyle::State_MouseOver | QStyle::State_Item);
++            if(m_highlighted) {
++                drawItemStyleOption(&pixmapPainter, widget, activeState | QStyle::State_Item | QStyle::State_MouseOver);
++            } else {
++                drawItemStyleOption(&pixmapPainter, widget, activeState | QStyle::State_Item);
++            }
+         }
+ 
+         const qreal opacity = painter->opacity();
+@@ -266,6 +271,10 @@
+ 
+ void KItemListWidget::setHovered(bool hovered)
+ {
++    if(!hovered) {
++        m_highlighted = false;
++    }
++
+     if (hovered == m_hovered) {
+         return;
+     }
+@@ -308,6 +317,16 @@
+     return m_hovered;
+ }
+ 
++void KItemListWidget::setHighlighted(bool highlighted)
++{
++    m_highlighted = highlighted;
++}
++
++bool KItemListWidget::isHighlighted() const
++{
++    return m_highlighted;
++}
++
+ void KItemListWidget::setExpansionAreaHovered(bool hovered)
+ {
+     if (hovered == m_expansionAreaHovered) {
+@@ -561,7 +580,7 @@
+ 
+ qreal KItemListWidget::hoverOpacity() const
+ {
+-    return m_hoverOpacity;
++    return 0;
+ }
+ 
+ int KItemListWidget::hoverSequenceIndex() const
+Index: src/kitemviews/kitemlistwidget.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/kitemviews/kitemlistwidget.h b/src/kitemviews/kitemlistwidget.h
+--- a/src/kitemviews/kitemlistwidget.h	(revision 9564df00262d06d29601bf8b4d19d6b874fa2a72)
++++ b/src/kitemviews/kitemlistwidget.h	(revision 86e5b368820af7d4d7455ccae039ba0714f127dc)
+@@ -99,6 +99,9 @@
+     void setHovered(bool hovered);
+     bool isHovered() const;
+ 
++    void setHighlighted(bool highlighted);
++    bool isHighlighted() const;
++
+     void setExpansionAreaHovered(bool hover);
+     bool expansionAreaHovered() const;
+ 
+@@ -258,6 +261,7 @@
+     bool m_selected;
+     bool m_current;
+     bool m_hovered;
++    bool m_highlighted;
+     bool m_expansionAreaHovered;
+     bool m_alternateBackground;
+     bool m_enabledSelectionToggle;
+Index: src/kitemviews/kstandarditemlistwidget.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/kitemviews/kstandarditemlistwidget.cpp b/src/kitemviews/kstandarditemlistwidget.cpp
+--- a/src/kitemviews/kstandarditemlistwidget.cpp	(revision 9564df00262d06d29601bf8b4d19d6b874fa2a72)
++++ b/src/kitemviews/kstandarditemlistwidget.cpp	(revision 86e5b368820af7d4d7455ccae039ba0714f127dc)
+@@ -345,7 +345,7 @@
+         drawSiblingsInformation(painter);
+     }
+ 
+-    auto pixmap = isHovered() ? m_hoverPixmap : m_pixmap;
++    auto pixmap = m_pixmap;
+     if (!m_overlays.isEmpty()) {
+         const qreal dpr = KItemViewsUtils::devicePixelRatio(this);
+ 
