@@ -1,0 +1,30 @@
+jacks@iMac ~ % sudo sh /Users/jacks/Downloads/firmware.sh 
+Detected macOS
+
+How do you want to copy the firmware to Linux?
+
+1. Copy the firmware to the EFI partition and run the same script on Linux to retrieve it.
+2. Create a tarball of the firmware and extract it to Linux.
+3. Create a Linux specific package which can be installed using a package manager.
+
+Note: Option 2 and 3 require additional software like python3 and tools specific for your package manager. Requirements will be told as you proceed further.
+2
+-e 
+Checking for missing dependencies
+-e 
+Python 3 not found. You will be prompted to install Xcode command line developer tools.
+xcode-select: note: install requested for command line developer tools
+
+Press enter after you have installed Xcode command line developer tools.
+-e 
+Creating a tarball of the firmware
+
+Firmware tarball saved to Downloads!
+
+Extract the tarball contents to /lib/firmware/brcm in Linux and run the following in the Linux terminal:
+
+sudo modprobe -r brcmfmac_wcc
+sudo modprobe -r brcmfmac
+sudo modprobe brcmfmac
+sudo modprobe -r hci_bcm4377
+sudo modprobe hci_bcm4377
