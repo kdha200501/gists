@@ -1,0 +1,54 @@
+Subject: [PATCH] jacks-customizations: interpret ctrl+down as open item signal
+---
+Index: src/dolphinviewcontainer.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/dolphinviewcontainer.cpp b/src/dolphinviewcontainer.cpp
+--- a/src/dolphinviewcontainer.cpp	(revision 3fec596abb522376380caff60a141f0edfa28902)
++++ b/src/dolphinviewcontainer.cpp	(revision 972084a84822f45c2f498726d0f3170fe84ec361)
+@@ -695,7 +695,13 @@
+         if (modifiers & Qt::ControlModifier && modifiers & Qt::ShiftModifier) {
+             Q_EMIT activeTabRequested(url);
+         } else if (modifiers & Qt::ControlModifier) {
+-            Q_EMIT tabRequested(url);
++            const auto mouseButtons = QGuiApplication::mouseButtons();
++
++            if (mouseButtons & Qt::LeftButton) {
++                Q_EMIT tabRequested(url);
++            } else {
++                setUrl(url);
++            }
+         } else if (modifiers & Qt::ShiftModifier) {
+             Dolphin::openNewWindow({KFilePlacesModel::convertedUrl(url)}, this);
+         } else {
+Index: src/kitemviews/kitemlistcontroller.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/kitemviews/kitemlistcontroller.cpp b/src/kitemviews/kitemlistcontroller.cpp
+--- a/src/kitemviews/kitemlistcontroller.cpp	(revision 3fec596abb522376380caff60a141f0edfa28902)
++++ b/src/kitemviews/kitemlistcontroller.cpp	(revision 972084a84822f45c2f498726d0f3170fe84ec361)
+@@ -379,6 +379,20 @@
+         break;
+ 
+     case Qt::Key_Down:
++        if(controlPressed) {
++            const KItemSet selectedItems = m_selectionManager->selectedItems();
++            if (selectedItems.count() >= 2) {
++              Q_EMIT itemsActivated(selectedItems);
++            } else if (selectedItems.count() == 1) {
++              Q_EMIT itemActivated(selectedItems.first());
++            } else {
++              Q_EMIT itemActivated(index);
++            }
++
++            event->ignore();
++            return true;
++        }
++
+         updateKeyboardAnchor();
+         if (shiftPressed && !m_selectionManager->isAnchoredSelectionActive() && m_selectionManager->isSelected(index)) {
+             m_selectionManager->beginAnchoredSelection(index);

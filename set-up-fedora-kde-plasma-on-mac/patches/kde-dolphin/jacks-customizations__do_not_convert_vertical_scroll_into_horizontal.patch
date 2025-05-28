@@ -1,0 +1,19 @@
+Subject: [PATCH] jacks-customizations: do not convert vertical scroll into horizontal
+---
+Index: src/kitemviews/kitemlistcontainer.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/kitemviews/kitemlistcontainer.cpp b/src/kitemviews/kitemlistcontainer.cpp
+--- a/src/kitemviews/kitemlistcontainer.cpp	(revision cc65783f59e2f6fae4bea1f4fba0c0498a654fa7)
++++ b/src/kitemviews/kitemlistcontainer.cpp	(revision be550ddffbf12ed76e75aec7f6408f3f996af93f)
+@@ -184,7 +184,7 @@
+         return;
+     }
+ 
+-    const bool scrollHorizontally = (qAbs(event->angleDelta().y()) < qAbs(event->angleDelta().x())) || (!verticalScrollBar()->isVisible());
++    const bool scrollHorizontally = (qAbs(event->angleDelta().y()) < qAbs(event->angleDelta().x()));
+     KItemListSmoothScroller *smoothScroller = scrollHorizontally ? m_horizontalSmoothScroller : m_verticalSmoothScroller;
+ 
+     smoothScroller->handleWheelEvent(event);

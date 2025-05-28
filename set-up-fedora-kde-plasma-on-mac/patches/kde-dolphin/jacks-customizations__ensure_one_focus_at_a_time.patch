@@ -1,0 +1,110 @@
+Subject: [PATCH] jacks-customizations: ensure one focus at a time
+---
+Index: src/dolphinmainwindow.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/dolphinmainwindow.cpp b/src/dolphinmainwindow.cpp
+--- a/src/dolphinmainwindow.cpp	(revision 7f3f2559d73331c62323945026bf9b7ff5ac9e87)
++++ b/src/dolphinmainwindow.cpp	(revision 3cd876ee726bec0881e14b80bb900f0e4c716901)
+@@ -858,7 +858,10 @@
+ 
+ void DolphinMainWindow::find()
+ {
++    KUrlNavigator *navigator = m_activeViewContainer->urlNavigator();
++    navigator->setUrlEditable(false);
+     m_activeViewContainer->setSearchModeEnabled(true);
++    m_activeViewContainer->view()->clearSelection();
+ }
+ 
+ void DolphinMainWindow::updateSearchAction()
+@@ -1117,6 +1120,8 @@
+         navigator->setUrlEditable(true);
+         navigator->setFocus();
+         lineEdit->selectAll();
++        m_activeViewContainer->setSearchModeEnabled(false);
++        m_activeViewContainer->view()->clearSelection();
+     }
+ }
+ 
+@@ -2954,4 +2959,9 @@
+     }
+ }
+ 
++void DolphinMainWindow::focusOnDolphinView()
++{
++    m_activeViewContainer->view()->setFocus();
++}
++
+ #include "moc_dolphinmainwindow.cpp"
+Index: src/dolphinmainwindow.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/dolphinmainwindow.h b/src/dolphinmainwindow.h
+--- a/src/dolphinmainwindow.h	(revision 7f3f2559d73331c62323945026bf9b7ff5ac9e87)
++++ b/src/dolphinmainwindow.h	(revision 3cd876ee726bec0881e14b80bb900f0e4c716901)
+@@ -141,6 +141,8 @@
+      */
+     void slotDoubleClickViewBackground(Qt::MouseButton button);
+ 
++    void focusOnDolphinView();
++
+ public Q_SLOTS:
+     /**
+      * Opens each directory in \p dirs in a separate tab. If \a splitView is set,
+Index: src/dolphinnavigatorswidgetaction.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/dolphinnavigatorswidgetaction.cpp b/src/dolphinnavigatorswidgetaction.cpp
+--- a/src/dolphinnavigatorswidgetaction.cpp	(revision 7f3f2559d73331c62323945026bf9b7ff5ac9e87)
++++ b/src/dolphinnavigatorswidgetaction.cpp	(revision 3cd876ee726bec0881e14b80bb900f0e4c716901)
+@@ -5,6 +5,7 @@
+     SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+ */
+ 
++#include "dolphinmainwindow.h"
+ #include "dolphinnavigatorswidgetaction.h"
+ 
+ #include "trash/dolphintrash.h"
+@@ -24,6 +25,7 @@
+ 
+ DolphinNavigatorsWidgetAction::DolphinNavigatorsWidgetAction(QWidget *parent)
+     : QWidgetAction{parent}
++    , m_parent(parent)
+     , m_splitter{new QSplitter(Qt::Horizontal)}
+     , m_adjustSpacingTimer{new QTimer(this)}
+     , m_viewGeometriesHelper{m_splitter.get(), this}
+@@ -208,6 +210,11 @@
+         },
+         Qt::QueuedConnection);
+ 
++    connect(urlNavigator, &KUrlNavigator::returnPressed, this, [urlNavigator, this]() {
++      DolphinMainWindow *dolphinMainWindow = qobject_cast<DolphinMainWindow *>(m_parent);
++      dolphinMainWindow->focusOnDolphinView();
++    });
++
+     auto trailingSpacing = new QWidget{navigatorWidget};
+     layout->addWidget(trailingSpacing);
+     return navigatorWidget;
+Index: src/dolphinnavigatorswidgetaction.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/dolphinnavigatorswidgetaction.h b/src/dolphinnavigatorswidgetaction.h
+--- a/src/dolphinnavigatorswidgetaction.h	(revision 7f3f2559d73331c62323945026bf9b7ff5ac9e87)
++++ b/src/dolphinnavigatorswidgetaction.h	(revision 3cd876ee726bec0881e14b80bb900f0e4c716901)
+@@ -100,6 +100,8 @@
+     void deleteWidget(QWidget *widget) override;
+ 
+ private:
++  QObject *m_parent;
++  
+     /**
+      * In Left-to-right languages the Primary side will be the left one.
+      */

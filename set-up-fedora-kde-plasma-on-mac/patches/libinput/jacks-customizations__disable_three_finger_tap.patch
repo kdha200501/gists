@@ -1,0 +1,19 @@
+Subject: [PATCH] jacks-customizations: disable three finger tap
+---
+Index: src/evdev-mt-touchpad-tap.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/evdev-mt-touchpad-tap.c b/src/evdev-mt-touchpad-tap.c
+--- a/src/evdev-mt-touchpad-tap.c	(revision 3402f380019dc4f882e1d8627029607aca3f4be6)
++++ b/src/evdev-mt-touchpad-tap.c	(revision 62c1cafd9a714a47c1040d5740054a54ce79b8d7)
+@@ -133,7 +133,7 @@
+ 
+ 	assert(tp->tap.map < ARRAY_LENGTH(button_map));
+ 
+-	if (nfingers < 1 || nfingers > 3)
++	if (nfingers < 1 || nfingers > 2)
+ 		return;
+ 
+ 	button = button_map[tp->tap.map][nfingers - 1];
