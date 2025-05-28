@@ -1,0 +1,19 @@
+Subject: [PATCH] jacks-customizations: disable chain edit
+---
+Index: src/kitemviews/private/kitemlistroleeditor.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/kitemviews/private/kitemlistroleeditor.cpp b/src/kitemviews/private/kitemlistroleeditor.cpp
+--- a/src/kitemviews/private/kitemlistroleeditor.cpp	(revision 0fb381a7edef8b3c60f1c01fb7cc9d9335556fb4)
++++ b/src/kitemviews/private/kitemlistroleeditor.cpp	(revision cc65783f59e2f6fae4bea1f4fba0c0498a654fa7)
+@@ -43,7 +43,7 @@
+ 
+ void KItemListRoleEditor::setAllowUpDownKeyChainEdit(bool allowChainEdit)
+ {
+-    m_allowUpDownKeyChainEdit = allowChainEdit;
++    m_allowUpDownKeyChainEdit = false;
+ }
+ 
+ bool KItemListRoleEditor::eventFilter(QObject *watched, QEvent *event)

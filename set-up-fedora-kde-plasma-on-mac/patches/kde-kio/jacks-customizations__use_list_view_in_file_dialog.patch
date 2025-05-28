@@ -1,0 +1,234 @@
+Subject: [PATCH] jacks-customizations: use list view in file dialog
+---
+Index: src/filewidgets/kdiroperator.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/filewidgets/kdiroperator.cpp b/src/filewidgets/kdiroperator.cpp
+--- a/src/filewidgets/kdiroperator.cpp	(revision 9fb01f96c96e4e3c8a2954aece7415dca972dc0b)
++++ b/src/filewidgets/kdiroperator.cpp	(revision c2662eabfbc0c2491ba7ccd229a47b80bcd7c9f4)
+@@ -1019,12 +1019,12 @@
+     // - provide a signal 'sortingChanged()'
+     // - connect KDirOperatorDetailView() with this signal and update the
+     //   header internally
+-    QTreeView *treeView = qobject_cast<QTreeView *>(m_itemView);
++    KDirOperatorDetailView *treeView = qobject_cast<KDirOperatorDetailView *>(m_itemView);
+     if (treeView != nullptr) {
+-        QHeaderView *headerView = treeView->header();
+-        headerView->blockSignals(true);
+-        headerView->setSortIndicator(sortColumn(), sortOrder());
+-        headerView->blockSignals(false);
++        // QHeaderView *headerView = treeView->header();
++        // headerView->blockSignals(true);
++        // headerView->setSortIndicator(sortColumn(), sortOrder());
++        // headerView->blockSignals(false);
+     }
+ 
+     assureVisibleSelection();
+@@ -1698,13 +1698,13 @@
+     // d->itemView->setDropOptions(d->dropOptions);
+ 
+     // first push our settings to the view, then listen for changes from the view
+-    QTreeView *treeView = qobject_cast<QTreeView *>(d->m_itemView);
++    KDirOperatorDetailView *treeView = qobject_cast<KDirOperatorDetailView *>(d->m_itemView);
+     if (treeView) {
+-        QHeaderView *headerView = treeView->header();
+-        headerView->setSortIndicator(d->sortColumn(), d->sortOrder());
+-        connect(headerView, &QHeaderView::sortIndicatorChanged, this, [this](int logicalIndex, Qt::SortOrder order) {
+-            d->synchronizeSortingState(logicalIndex, order);
+-        });
++        // QHeaderView *headerView = treeView->header();
++        // headerView->setSortIndicator(d->sortColumn(), d->sortOrder());
++        // connect(headerView, &QHeaderView::sortIndicatorChanged, this, [this](int logicalIndex, Qt::SortOrder order) {
++        //     d->synchronizeSortingState(logicalIndex, order);
++        // });
+     }
+ 
+     connect(d->m_itemView, &QAbstractItemView::activated, this, [this](QModelIndex index) {
+@@ -1748,7 +1748,7 @@
+     // needs to be done here, and not in createView, since we can be set an external view
+     d->m_decorationMenu->setEnabled(qobject_cast<QListView *>(d->m_itemView));
+ 
+-    d->m_shouldFetchForItems = qobject_cast<QTreeView *>(view);
++    d->m_shouldFetchForItems = qobject_cast<KDirOperatorDetailView *>(view);
+     if (d->m_shouldFetchForItems) {
+         connect(d->m_dirModel, &KDirModel::expand, this, [this](QModelIndex index) {
+             d->slotExpandToUrl(index);
+@@ -1795,7 +1795,7 @@
+     d->m_dirModel->setDirLister(d->m_dirLister);
+     d->m_dirModel->setDropsAllowed(KDirModel::DropOnDirectory);
+ 
+-    d->m_shouldFetchForItems = qobject_cast<QTreeView *>(d->m_itemView);
++    d->m_shouldFetchForItems = qobject_cast<KDirOperatorDetailView *>(d->m_itemView);
+     if (d->m_shouldFetchForItems) {
+         connect(d->m_dirModel, &KDirModel::expand, this, [this](QModelIndex index) {
+             d->slotExpandToUrl(index);
+@@ -2855,7 +2855,7 @@
+ 
+ void KDirOperatorPrivate::slotExpandToUrl(const QModelIndex &index)
+ {
+-    QTreeView *treeView = qobject_cast<QTreeView *>(m_itemView);
++    KDirOperatorDetailView *treeView = qobject_cast<KDirOperatorDetailView *>(m_itemView);
+ 
+     if (!treeView) {
+         return;
+Index: src/filewidgets/kdiroperatordetailview.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/filewidgets/kdiroperatordetailview.cpp b/src/filewidgets/kdiroperatordetailview.cpp
+--- a/src/filewidgets/kdiroperatordetailview.cpp	(revision 9fb01f96c96e4e3c8a2954aece7415dca972dc0b)
++++ b/src/filewidgets/kdiroperatordetailview.cpp	(revision c2662eabfbc0c2491ba7ccd229a47b80bcd7c9f4)
+@@ -19,7 +19,7 @@
+ #include <QScrollBar>
+ 
+ KDirOperatorDetailView::KDirOperatorDetailView(KDirOperator *dirOperator, QWidget *parent)
+-    : QTreeView(parent)
++    : QListView(parent)
+     , m_hideDetailColumns(false)
+     , m_isEmblemClicked(false)
+     , m_dirOperator(dirOperator)
+@@ -40,6 +40,14 @@
+     horizontalScrollBar()->setSingleStep(singleStep);
+ }
+ 
++void KDirOperatorDetailView::setRootIsDecorated(bool b) {}
++void KDirOperatorDetailView::setSortingEnabled(bool b) {}
++void KDirOperatorDetailView::setUniformRowHeights(bool b) {}
++void KDirOperatorDetailView::setItemsExpandable(bool b) {}
++void KDirOperatorDetailView::setColumnHidden(int column, bool hide) {}
++void KDirOperatorDetailView::hideColumn(int column) {}
++void KDirOperatorDetailView::expand(const QModelIndex &index) {}
++
+ KDirOperatorDetailView::~KDirOperatorDetailView()
+ {
+ }
+@@ -68,30 +76,30 @@
+     // This allows to have a horizontal scrollbar in case this view is used as
+     // a plain treeview instead of cutting off filenames, especially useful when
+     // using KDirOperator in horizontally limited parts of an app.
+-    if (tree && m_hideDetailColumns) {
+-        header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+-    } else {
+-        header()->setSectionResizeMode(QHeaderView::Interactive);
+-    }
++    // if (tree && m_hideDetailColumns) {
++    //     header()->setSectionResizeMode(QHeaderView::ResizeToContents);
++    // } else {
++    //     header()->setSectionResizeMode(QHeaderView::Interactive);
++    // }
+ 
+     return true;
+ }
+ 
+ void KDirOperatorDetailView::initViewItemOption(QStyleOptionViewItem *option) const
+ {
+-    QTreeView::initViewItemOption(option);
++    QListView::initViewItemOption(option);
+     option->textElideMode = Qt::ElideMiddle;
+ }
+ 
+ bool KDirOperatorDetailView::event(QEvent *event)
+ {
+     if (event->type() == QEvent::Polish) {
+-        QHeaderView *headerView = header();
+-        headerView->setSectionResizeMode(0, QHeaderView::Stretch);
+-        headerView->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+-        headerView->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+-        headerView->setStretchLastSection(false);
+-        headerView->setSectionsMovable(false);
++        // QHeaderView *headerView = header();
++        // headerView->setSectionResizeMode(0, QHeaderView::Stretch);
++        // headerView->setSectionResizeMode(1, QHeaderView::ResizeToContents);
++        // headerView->setSectionResizeMode(2, QHeaderView::ResizeToContents);
++        // headerView->setStretchLastSection(false);
++        // headerView->setSectionsMovable(false);
+ 
+         setColumnHidden(KDirModel::Size, m_hideDetailColumns);
+         setColumnHidden(KDirModel::ModifiedTime, m_hideDetailColumns);
+@@ -106,7 +114,7 @@
+         }
+     }
+ 
+-    return QTreeView::event(event);
++    return QListView::event(event);
+ }
+ 
+ void KDirOperatorDetailView::dragEnterEvent(QDragEnterEvent *event)
+@@ -125,7 +133,7 @@
+         return;
+     }
+ 
+-    QTreeView::mousePressEvent(event);
++    QListView::mousePressEvent(event);
+ 
+     if (!index.isValid() || (index.column() != KDirModel::Name)) {
+         const Qt::KeyboardModifiers modifiers = QApplication::keyboardModifiers();
+@@ -141,7 +149,7 @@
+     if (m_isEmblemClicked) {
+         return;
+     }
+-    QTreeView::mouseMoveEvent(event);
++    QListView::mouseMoveEvent(event);
+ }
+ 
+ void KDirOperatorDetailView::mouseReleaseEvent(QMouseEvent *event)
+@@ -150,12 +158,12 @@
+     if (m_isEmblemClicked) {
+         m_isEmblemClicked = false;
+     }
+-    QTreeView::mouseReleaseEvent(event);
++    QListView::mouseReleaseEvent(event);
+ }
+ 
+ void KDirOperatorDetailView::currentChanged(const QModelIndex &current, const QModelIndex &previous)
+ {
+-    QTreeView::currentChanged(current, previous);
++    QListView::currentChanged(current, previous);
+ }
+ 
+ #include "moc_kdiroperatordetailview_p.cpp"
+Index: src/filewidgets/kdiroperatordetailview_p.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/filewidgets/kdiroperatordetailview_p.h b/src/filewidgets/kdiroperatordetailview_p.h
+--- a/src/filewidgets/kdiroperatordetailview_p.h	(revision 9fb01f96c96e4e3c8a2954aece7415dca972dc0b)
++++ b/src/filewidgets/kdiroperatordetailview_p.h	(revision c2662eabfbc0c2491ba7ccd229a47b80bcd7c9f4)
+@@ -8,7 +8,8 @@
+ #define KDIROPERATORDETAILVIEW_P_H
+ 
+ #include <KDirOperator>
+-#include <QTreeView>
++#include <QListView>
++#include <QModelIndex>
+ 
+ #include <kfile.h>
+ 
+@@ -18,7 +19,7 @@
+  * Default detail view for KDirOperator using
+  * custom resizing options and columns.
+  */
+-class KDirOperatorDetailView : public QTreeView
++class KDirOperatorDetailView : public QListView
+ {
+     Q_OBJECT
+ 
+@@ -31,6 +32,14 @@
+      */
+     virtual bool setViewMode(KFile::FileView viewMode);
+ 
++    void setRootIsDecorated(bool b);
++    void setSortingEnabled(bool b);
++    void setUniformRowHeights(bool b);
++    void setItemsExpandable(bool b);
++    void setColumnHidden(int column, bool hide);
++    void hideColumn(int column);
++    void expand(const QModelIndex &index);
++
+ protected:
+     void initViewItemOption(QStyleOptionViewItem *option) const override;
+ 
