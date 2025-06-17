@@ -1,3 +1,4 @@
+From: Jacks Diao <kdha200501@gmail.com>
 Subject: [PATCH] jacks-customizations: do not convert vertical scroll into horizontal
 ---
 Index: src/kitemviews/kitemlistcontainer.cpp

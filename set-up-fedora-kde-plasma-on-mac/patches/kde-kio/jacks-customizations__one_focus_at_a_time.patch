@@ -1,3 +1,4 @@
+From: Jacks Diao <kdha200501@gmail.com>
 Subject: [PATCH] jacks-customizations: one focus at a time
 ---
 Index: src/filewidgets/kdiroperator.cpp

@@ -1179,7 +1179,7 @@ Three finger gestures must be disabled so that `fusuma` can react to three-finge
 Copy this patch ([link](patches/kde-kwin/jacks-customizations__disable_three_finger_gestures.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -1193,7 +1193,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-kwin/jacks-customizations__disable_natural_swiping.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -1378,7 +1378,7 @@ $ meson setup --prefix=/usr build/
 Copy this patch ([link](patches/libinput/jacks-customizations__disable_three_finger_tap.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -1766,7 +1766,7 @@ Customize title bar buttons
 Copy this patch ([link](patches/kde-kwin/jacks-customizations__customize_window_decoration.patch)) and apply to modify *Aurorae* to better recreate the Mac OS 9 platinum look and feel by adding background color to window CTA and window title
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 See above to recompile and update `kwin`
@@ -1961,7 +1961,7 @@ $ cmake ..
 Copy this patch ([link](patches/kde-dolphin/jacks-customizations__disable_chain_edit.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -1973,7 +1973,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-dolphin/jacks-customizations__do_not_convert_vertical_scroll_into_horizontal.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -1985,7 +1985,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-dolphin/jacks-customizations__display_mouse-over_effect_when_dragging,_only.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -1997,7 +1997,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-dolphin/jacks-customizations__interpret_ctrl+down_as_open_item_signal.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -2009,7 +2009,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-dolphin/jacks-customizations__interpret_the_enter_QKeyEvent_on_file_as_rename_signal.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -2021,7 +2021,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-dolphin/jacks-customizations__ensure_one_focus_at_a_time.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -2033,7 +2033,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-dolphin/jacks-customizations__use_triangle_in_tree_view.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -2113,7 +2113,7 @@ $ cmake ..
 Copy this patch ([link](patches/kde-kio/jacks-customizations__use_list_view_in_file_dialog.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -2125,7 +2125,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-kio/jacks-customizations__disable_mouse_over_effect.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -2137,7 +2137,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-kio/jacks-customizations__one_focus_at_a_time.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -2209,7 +2209,7 @@ $ cmake ..
 Copy this patch ([link](patches/kde-plasma-desktop/jacks-customizations__do_not_include_background_when_caching.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -2221,7 +2221,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-plasma-desktop/jacks-customizations__include_background_when_folder_is_dragged_over.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -2233,7 +2233,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-plasma-desktop/jacks-customizations__add_shortcuts.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 
@@ -2245,7 +2245,7 @@ $ wl-paste | git apply
 Copy this patch ([link](patches/kde-plasma-desktop/jacks-customizations__fix_desktop_icon_label_text.patch)) and apply
 
 ```shell
-$ wl-paste | git apply
+$ wl-paste | git am
 ```
 
 

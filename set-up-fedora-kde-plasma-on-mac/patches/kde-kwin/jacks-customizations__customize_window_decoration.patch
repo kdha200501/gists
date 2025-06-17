@@ -1,3 +1,4 @@
+From: Jacks Diao <kdha200501@gmail.com>
 Subject: [PATCH] jacks-customizations: customize window decoration
 ---
 Index: src/plugins/kdecorations/aurorae/src/qml/aurorae.qml
