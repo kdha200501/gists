@@ -1,3 +1,4 @@
+From: Jacks Diao <kdha200501@gmail.com>
 Subject: [PATCH] jacks-customizations: fix desktop icon label text
 ---
 Index: containments/desktop/package/contents/ui/FolderItemDelegate.qml
