@@ -4,6 +4,45 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Install *Git*
+
+```shell
+$ sudo dnf install git
+$ git config --global user.email "user.email@domain.com"
+$ git config --global user.name "Firstname Lastname"
+$ git config --global core.editor "vim"
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Install Chrome
 
 - Download and install the `.rpm` version of Google Chrome, ref: [link](https://www.google.com/chrome/)
@@ -79,31 +118,6 @@ Add the following:
 ```shell
 set whichwrap+=<,>,h,l,[,]
 syntax on
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Install *Git*
-
-```shell
-$ sudo dnf install git
-$ git config --global user.email "user.email@domain.com"
-$ git config --global user.name "Firstname Lastname"
-$ git config --global core.editor "vim"
 ```
 
 
@@ -793,7 +807,9 @@ $ groups
 
 ##### Give the `input` group the permissions to read and write to `/dev/input/`
 
-Note, this will allow the current user to run  `xremap` without root permission
+> [!IMPORTANT]
+>
+> this will allow the current user to run  `xremap` without root permission
 
 ```shell
 $ echo 'KERNEL=="uinput", MODE="0660", GROUP="input", OPTIONS+="static_node=uinput"' | sudo tee /etc/udev/rules.d/input.rules
@@ -2386,9 +2402,7 @@ X-KDE-SubstituteUID=false
 
 # Install *Zoom*
 
-```shell
-$ sudo dnf install zoom_x86_64.rpm
-```
+Download and install from official website, ref: [link](https://zoom.us/download?os=linux)
 
 
 
