@@ -1,3 +1,4 @@
+From: Jacks Diao <kdha200501@gmail.com>
 Subject: [PATCH] jacks-customizations: do not include background when caching folder item image for dragging
 ---
 Index: containments/desktop/package/contents/ui/FolderItemDelegate.qml

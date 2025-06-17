@@ -1,3 +1,4 @@
+From: Jacks Diao <kdha200501@gmail.com>
 Subject: [PATCH] jacks-customizations: use triangle in tree view
 ---
 Index: src/kitemviews/kstandarditemlistwidget.cpp
