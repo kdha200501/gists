@@ -1,3 +1,4 @@
+From: Jacks Diao <kdha200501@gmail.com>
 Subject: [PATCH] jacks-customizations: display mouse-over effect when dragging, only
 ---
 Index: src/kitemviews/kitemlistcontroller.cpp

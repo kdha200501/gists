@@ -1,3 +1,4 @@
+From: Jacks Diao <kdha200501@gmail.com>
 Subject: [PATCH] jacks-customizations: interpret ctrl+down as open item signal
 ---
 Index: src/dolphinviewcontainer.cpp

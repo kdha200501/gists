@@ -1,3 +1,4 @@
+From: Jacks Diao <kdha200501@gmail.com>
 Subject: [PATCH] jacks-customizations: interpret the enter QKeyEvent on file as rename signal
 ---
 Index: src/kitemviews/kitemlistcontroller.cpp
