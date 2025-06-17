@@ -55,6 +55,66 @@ $ git config --global core.editor "vim"
 
 
 
+##### Create launcher for *Google Keep*
+
+```shell
+$ sudo touch /usr/share/applications/google-keep.desktop
+$ sudo vim /usr/share/applications/google-keep.desktop
+```
+
+Copy and paste:
+
+```
+[Desktop Entry]
+Comment=Make notes
+Exec=\sgoogle-chrome -app=https://keep.google.com
+Name=Google Keep
+Icon=/path/to/icon
+NoDisplay=false
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Office;Utility
+X-KDE-SubstituteUID=false
+```
+
+> [!IMPORTANT]
+>
+> update icon path
+>
+
+
+
+##### Create launcher for *Google Calendar*
+
+```shell
+$ sudo touch /usr/share/applications/google-calendar.desktop
+$ sudo vim /usr/share/applications/google-calendar.desktop
+```
+
+Copy and paste:
+
+```
+[Desktop Entry]
+Comment=Make notes
+Exec=\sgoogle-chrome -app=https://calendar.google.com/calendar
+Name=Google Calendar
+Icon=/path/to/icon
+NoDisplay=false
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Office;Utility
+X-KDE-SubstituteUID=false
+```
+
+> [!IMPORTANT]
+>
+> update icon path
+>
+
+
+
 
 
 
@@ -575,6 +635,19 @@ Logs can be found using:
 
 ```shell
 $ journalctl -t "toggle-core"
+```
+
+
+
+
+
+##### Kernel regression issue
+
+This workaround works up to the `6.14.0` kernel as far as I know. In order to boot into the `6.14.0` kernel:
+
+```shell
+$ sudo grubby --set-default /boot/vmlinuz-6.14.0-63.fc42.x86_64
+$ sudo grubby --default-kernel
 ```
 
 
@@ -1457,6 +1530,34 @@ Set "Cursor feedback" to `None`
 
 
 
+# Customize system sounds
+
+```shell
+$ mkdir ~/.local/share/sounds
+$ cd ~/.local/share/sounds
+$ git clone https://github.com/lucagoc/MacOSSounds4Gnome.git
+```
+
+Launch "System Settings"
+
+Go to "Colors & Themes" -> "System Sounds"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Customize panel
 
 Right click on desktop -> "Enter Edit Mode" -> click on the panel
@@ -1475,6 +1576,8 @@ Right click on desktop -> "Enter Edit Mode" -> click on the panel
     - search for "Window Title Applet 6 by dhruv8sh"
 
 - display the current application's menu in the panel
+
+  - right click on panel -> "Show Panel Configuration" -> "Add Widgets" -> "Global Menu"
 
 - hide date
 
@@ -1655,7 +1758,11 @@ $ cd ~/.local/share/icons/
 $ git clone git@github.com:kdha200501/jacks-kde-icon-pack.git
 ```
 
-*n.b.* credit goes to marcello-c ref: [link 1](https://www.deviantart.com/marcello-c/art/Classic-Mac-Style-Drives-for-OS-X-625109975) [link2](https://www.deviantart.com/marcello-c/art/Classic-Mac-Style-Folders-for-OS-X-624900831)
+> [!NOTE]
+>
+> credit goes to marcello-c ref: [link 1](https://www.deviantart.com/marcello-c/art/Classic-Mac-Style-Drives-for-OS-X-625109975) [link2](https://www.deviantart.com/marcello-c/art/Classic-Mac-Style-Folders-for-OS-X-624900831)
+
+Go to "System Settings" -> "Colors & Themes" -> "Jacks-KDE-Icon-Pack"
 
 
 
@@ -1832,7 +1939,9 @@ Apply the customization through "Kvantum Manager":
 $ kvantummanager
 ```
 
-Then choose "Select a Kvantum theme folder"
+Under "Install/Update theme", choose "Select a Kvantum theme folder" and "Install this theme"
+
+Under "Change/delete theme", choose "Mac9KvantumClassic"
 
 
 
@@ -2072,6 +2181,29 @@ $ sudo make install
 
 
 
+##### Create "Finder" launcher
+
+```shell
+$ sudo touch /usr/share/applications/finder.desktop
+$ sudo vim /usr/share/applications/finder.desktop
+```
+
+Copy and paste:
+
+```shell
+[Desktop Entry]
+Type=Application
+Name=Finder
+Exec=dolphin
+Icon=/path/to/finder.svg
+Terminal=false
+Categories=Utility;FileManager;
+```
+
+
+
+
+
 
 
 
@@ -2097,6 +2229,7 @@ $ cd kio
 $ git fetch --prune
 $ rpm -qa | grep kf6-kio
 $ git checkout v6.6.0
+$ git checkout -b jacks-customizations
 
 # install dependencies
 $ mkdir build
@@ -2193,6 +2326,7 @@ $ cd plasma-desktop
 $ git fetch --prune
 $ plasmashell --version
 $ git checkout v6.1.5
+$ git checkout -b jacks-customizations
 
 # install dependencies
 $ mkdir build
@@ -2308,82 +2442,6 @@ StartupWMClass=webstorm
 ```
 
 Import IDE settings from [kde__webstorm-settings.zip](./kde__webstorm-settings.zip)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Install *Google Keep*
-
-```shell
-$ sudo touch /usr/share/applications/google-keep.desktop
-$ sudo vim /usr/share/applications/google-keep.desktop
-```
-
-Add the following:
-
-```
-[Desktop Entry]
-Comment=Make notes
-Exec=\sgoogle-chrome -app=https://keep.google.com
-Name=Google Keep
-NoDisplay=false
-StartupNotify=true
-Terminal=false
-Type=Application
-Categories=Office;Utility
-X-KDE-SubstituteUID=false
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Install *Google Calendar*
-
-```shell
-$ sudo touch /usr/share/applications/google-calendar.desktop
-$ sudo vim /usr/share/applications/google-calendar.desktop
-```
-
-Add the following:
-
-```
-[Desktop Entry]
-Comment=Make notes
-Exec=\sgoogle-chrome -app=https://calendar.google.com/calendar
-Name=Google Calendar
-NoDisplay=false
-StartupNotify=true
-Terminal=false
-Type=Application
-Categories=Office;Utility
-X-KDE-SubstituteUID=false
-```
 
 
 
