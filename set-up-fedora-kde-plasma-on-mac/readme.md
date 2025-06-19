@@ -2069,6 +2069,103 @@ $ rm -rf Maia_Transparent_Bak/
 
 
 
+# Customize `kio`
+
+##### Setup development for `kio`
+
+```shell
+$ cd ~/Downloads
+$ git clone https://invent.kde.org/frameworks/kio.git
+
+# branch off of the correct version
+$ cd kio
+$ git fetch --prune
+$ rpm -qa | grep kf6-kio
+$ git checkout v6.6.0
+$ git checkout -b jacks-customizations
+
+# install dependencies
+$ mkdir build
+$ cd build
+$ sudo dnf install libxslt-devel kf6-karchive-devel.x86_64
+$ cmake ..
+```
+
+
+
+
+
+##### Use list view in file dialog
+
+Copy this patch ([link](patches/kde-kio/jacks-customizations__use_list_view_in_file_dialog.patch)) and apply
+
+```shell
+$ wl-paste | git am
+```
+
+
+
+
+
+##### Disable mouse over effect
+
+Copy this patch ([link](patches/kde-kio/jacks-customizations__disable_mouse_over_effect.patch)) and apply
+
+```shell
+$ wl-paste | git am
+```
+
+
+
+
+
+##### One focus at a time
+
+Copy this patch ([link](patches/kde-kio/jacks-customizations__one_focus_at_a_time.patch)) and apply
+
+```shell
+$ wl-paste | git am
+```
+
+
+
+
+
+##### Compiled and install `kio`
+
+```shell
+$ make -j 8
+$ sudo make install
+$ kwin_wayland --replace &
+```
+
+
+
+
+
+##### Debugging
+
+```shell
+# note: std::cout.flush(); is needed for real-time log
+$ sudo journalctl -b -f
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Customize `Dolphin`
 
 ##### Setup development for `Dolphin`
@@ -2227,103 +2324,6 @@ Exec=dolphin
 Icon=/path/to/finder.svg
 Terminal=false
 Categories=Utility;FileManager;
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Customize `kio`
-
-##### Setup development for `kio`
-
-```shell
-$ cd ~/Downloads
-$ git clone https://invent.kde.org/frameworks/kio.git
-
-# branch off of the correct version
-$ cd kio
-$ git fetch --prune
-$ rpm -qa | grep kf6-kio
-$ git checkout v6.6.0
-$ git checkout -b jacks-customizations
-
-# install dependencies
-$ mkdir build
-$ cd build
-$ sudo dnf install libxslt-devel kf6-karchive-devel.x86_64
-$ cmake ..
-```
-
-
-
-
-
-##### Use list view in file dialog
-
-Copy this patch ([link](patches/kde-kio/jacks-customizations__use_list_view_in_file_dialog.patch)) and apply
-
-```shell
-$ wl-paste | git am
-```
-
-
-
-
-
-##### Disable mouse over effect
-
-Copy this patch ([link](patches/kde-kio/jacks-customizations__disable_mouse_over_effect.patch)) and apply
-
-```shell
-$ wl-paste | git am
-```
-
-
-
-
-
-##### One focus at a time
-
-Copy this patch ([link](patches/kde-kio/jacks-customizations__one_focus_at_a_time.patch)) and apply
-
-```shell
-$ wl-paste | git am
-```
-
-
-
-
-
-##### Compiled and install `kio`
-
-```shell
-$ make -j 8
-$ sudo make install
-$ kwin_wayland --replace &
-```
-
-
-
-
-
-##### Debugging
-
-```shell
-# note: std::cout.flush(); is needed for real-time log
-$ sudo journalctl -b -f
 ```
 
 
