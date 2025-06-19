@@ -1840,7 +1840,7 @@ For example, installing a BeOS decoration
 
 # Convert the installed decoration into Mac OS 9
 
-Using assets generously provided by Michael Feeney (ref: [link](https://www.figma.com/community/file/966779730364082883/mac-os-9-ui-kit)), we apply the Mac OS 9 platinum design on top of the BeOS decoration
+Using assets generously provided by Michael Feeney (ref: [link](https://www.figma.com/community/file/966779730364082883/mac-os-9-ui-kit)), we apply the Mac OS 9 platinum design on top of the BeOS window decoration
 
 ```shell
 $ cd ~/.local/share/aurorae/themes
@@ -1859,24 +1859,54 @@ Customize title bar buttons
 
 
 
-
-##### Customize window decoration
+##### Setup development for `aurorae`
 
 > [!TIP]
 >
-> Some customizations cannot be made through using .svg files or updating the rc file such as adding background to the window title text. The only option is to modify *Aurorae*.
+> Some window decoration customizations cannot be made through using .svg assets or updating the rc file such as adding background to the window title text. The only option is to modify *Aurorae*.
 >
-> *Aurorae* is written in QML, and its code base is under the `kwin` repository.
+> *Aurorae* is written in QML, and its code base is now separated from the `kwin` repository, ref: [link](https://invent.kde.org/plasma/kwin/-/issues/139#note_1104241).
+
+```shell
+$ cd ~/Downloads
+$ git clone https://invent.kde.org/plasma/aurorae.git
+
+# branch off of the correct version
+$ cd aurorae
+$ git fetch --prune
+$ kwin_wayland --version
+$ git checkout v6.4.0
+$ git checkout -b jacks-customizations
+
+# install dependencies
+$ mkdir build
+$ cd build
+$ cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+
+```
 
 
 
-Copy this patch ([link](patches/kde-kwin/jacks-customizations__customize_window_decoration.patch)) and apply to modify *Aurorae* to better recreate the Mac OS 9 platinum look and feel by adding background color to window CTA and window title
+
+
+##### Customize `aurorae` for Mac OS 9 window decoration
+
+Copy this patch ([link](patches/kde-aurorae/jacks-customizations__customize_window_decoration.patch)) and apply to modify *Aurorae* to better recreate the Mac OS 9 platinum look and feel by adding background color to window CTA and window title
 
 ```shell
 $ wl-paste | git am
 ```
 
-See above to recompile and update `kwin`
+
+
+
+
+##### Compile and install `aurorae`
+
+```shell
+$ make -j 8
+$ sudo make install
+```
 
 
 

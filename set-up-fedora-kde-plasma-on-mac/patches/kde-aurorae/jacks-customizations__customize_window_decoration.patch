@@ -1,14 +1,14 @@
 From: Jacks Diao <kdha200501@gmail.com>
 Subject: [PATCH] jacks-customizations: customize window decoration
 ---
-Index: src/plugins/kdecorations/aurorae/src/qml/aurorae.qml
+Index: src/qml/aurorae.qml
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/src/plugins/kdecorations/aurorae/src/qml/aurorae.qml b/src/plugins/kdecorations/aurorae/src/qml/aurorae.qml
---- a/src/plugins/kdecorations/aurorae/src/qml/aurorae.qml	(revision 1a24f02af8383f470c1cd4aa676c11d5d848f271)
-+++ b/src/plugins/kdecorations/aurorae/src/qml/aurorae.qml	(revision 72866971db5b8d7e889e45c149a2948a8a7ce1ed)
+diff --git a/src/qml/aurorae.qml b/src/qml/aurorae.qml
+--- a/src/qml/aurorae.qml	(revision 6fdfca8f4c59593005f14ec2f374eafd1e06e8f3)
++++ b/src/qml/aurorae.qml	(revision 86788143a16e09fc23e5d74e6f024bfd9187de79)
 @@ -13,14 +13,14 @@
      property alias decorationMask: maskItem.mask
      property alias supportsMask: backgroundSvg.supportsMask
