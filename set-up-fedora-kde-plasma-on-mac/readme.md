@@ -2952,5 +2952,68 @@ location / {
 
 
 
+# Bundle up KDE patches
+
+The above-mentioned KDE code patches require `make` and `make install`, their installed files can be bundled into a tar ball so that other machines (of the same CPU architecture and KDE version) can repeat the changes without compiling.
+
+
+
+
+
+##### Gather compiled files
+
+Assuming the above-mentioned KDE code changes are successfully compiled
+
+```shell
+$ cd ~/Downloads/kwin/build
+$ sudo make install DESTDIR=~/Desktop/kde-patched
+
+$ cd ~/Downloads/kio/build
+$ sudo make install DESTDIR=~/Desktop/kde-patched
+
+$ cd ~/Downloads/dolphin/build
+$ sudo make install DESTDIR=~/Desktop/kde-patched
+
+$ cd ~/Downloads/aurorae/build
+$ sudo make install DESTDIR=~/Desktop/kde-patched
+
+$ cd ~/Downloads/plasma-desktop/build
+$ sudo make install DESTDIR=~/Desktop/kde-patched
+```
+
+
+
+
+
+##### Create patch
+
+```shell
+$ tar czf ~/Desktop/kwin-patched.tar.gz -C ~/Desktop/kwin-patched/ .
+```
+
+
+
+
+
+##### Apply patch
+
+Download and then extract the tar ball on to another machine of the same CPU architecture and KDE version
+
+```shell
+$ sudo tar xzf kwin-custom.tar.gz -C /
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
