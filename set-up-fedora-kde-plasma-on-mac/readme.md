@@ -852,14 +852,11 @@ also see: `/usr/include/linux/input-event-codes.h`
 
 # Grant the current user access to `/dev/input/`
 
-Both `xremap` and `ydotoold` need this permission
+`xremap`needs this permission
 
 > [!TIP]
 >
 > - we need `xremap` for remapping keyboard shortcuts
-> - we need `fusuma` for remapping gestures to actions
->   - `fusuma` needs  `ydotool` for converting gesture to keyboard shortcuts
->     - `ydotool` needs `ydotoold` for sending keyboard shortcuts
 
 
 
@@ -1110,13 +1107,12 @@ Copy and paste:
       },
       "remap": {
         "Super-C": "Control_L-Shift-C",
-        "Alt-KEY_RIGHTBRACE": "Control-Shift_L-KEY_PAGEDOWN",
-        "Alt-KEY_LEFTBRACE": "Control-Shift_L-KEY_PAGEUP"
+        "Super-E": "Control_L-Shift-E",
+        "Super-A": "Control_L-Shift-A"
       }
     }
   ]
 }
-
 ```
 
 
@@ -1218,7 +1214,7 @@ Go to "Window Management" -> "Task Switcher" -> "Main"
 
 
 
-# Remap gestures to keyboard shortcuts
+# Map gestures to keyboard shortcuts
 
 ##### Setup development for `kwin`
 
@@ -1245,11 +1241,11 @@ $ cmake ..
 
 
 
-##### Disable three finger gestures
+##### Disable natural swiping
 
-Three finger gestures must be disabled so that `fusuma` can react to three-finger gestures (if configured)
+"Natural" is unnatural to me, so...
 
-Copy this patch ([link](patches/kde-kwin/jacks-customizations__disable_three_finger_gestures.patch)) and apply
+Copy this patch ([link](patches/kde-kwin/jacks-customizations__disable_natural_swiping.patch)) and apply
 
 ```shell
 $ wl-paste | git am
@@ -1259,11 +1255,11 @@ $ wl-paste | git am
 
 
 
-##### Disable natural swiping
+##### Interpret three-fingers gestures as navigation
 
-"Natural" is unnatural to me, so...
+Use three-fingers left swipe and right swipe as navigation
 
-Copy this patch ([link](patches/kde-kwin/jacks-customizations__disable_natural_swiping.patch)) and apply
+Copy this patch ([link](patches/kde-kwin/jacks-customizations__interpret_three-fingers_swipe_as_history_nav_using_input_redirection.patch)) and apply
 
 ```shell
 $ wl-paste | git am
@@ -1279,123 +1275,6 @@ $ wl-paste | git am
 $ make -j 8
 $ sudo make install
 $ kwin_wayland --replace &
-```
-
-
-
-
-
-##### Install `ydotool`
-
-ref: [link](https://copr.fedorainfracloud.org/coprs/wef/ydotool/)
-
-```shell
-$ sudo dnf copr enable wef/ydotool 
-$ sudo dnf install ydotool
-```
-
-
-
-
-
-##### Install `ruby` and its package manager
-
-```shell
-$ sudo dnf install ruby
-```
-
-
-
-
-
-##### Install `fusuma`
-
-```shell
-$ sudo gem install fusuma
-```
-
-> [!TIP]
->
-> note: installs globally
-
-
-
-
-
-##### Configure `fusuma`
-
-```shell
-$ mkdir ~/.fusuma
-$ touch ~/.fusuma/config.yml
-$ atom ~/.fusuma/config.yml	
-```
-
-Add the following:
-
-```yaml
-swipe:
-  3:
-    left:
-      command: 'ydotool key 56:1 105:1 105:0 56:0'
-      threshold: 0.5
-    right:
-      command: 'ydotool key 56:1 106:1 106:0 56:0'
-      threshold: 0.5
-```
-
-
-
-
-
-##### Test `fusuma` [optional]
-
-```shell
-$ ydotoold
-$ fusuma -c ~/.fusuma/config.yml
-```
-
-
-
-
-
-##### Disable the installed daemon
-
-The `ydotool.service` does not work, so...
-
-```shell
-$ sudo systemctl stop ydotool.service
-$ sudo systemctl disable ydotool.service
-```
-
-
-
-
-
-##### Run `fusuma` upon user log in
-
-```shell
-$ touch ~/.fusuma/launch.sh
-$ chmod u+x ~/.fusuma/launch.sh
-$ atom ~/.fusuma/launch.sh
-```
-
-Add the following:
-
-```sh
-#!/bin/bash
-fusuma -d -c ~/.fusuma/config.yml > /dev/null 2>&1
-```
-
-Launch "System Settings"
-
-Go to "Autostart" -> "Add" -> "Add Application" -> Browse -> `/usr/bin/ydotoold`
-
-Go to "Autostart" -> "Add" -> "Add Login Script"
-
-Choose `launch.sh`
-
-```shell
-$ sudo reboot
 ```
 
 
