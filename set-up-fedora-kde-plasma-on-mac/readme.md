@@ -2867,7 +2867,7 @@ $ sudo make install DESTDIR=~/Desktop/kde-patched
 ##### Create patch
 
 ```shell
-$ tar czf ~/Desktop/kwin-patched.tar.gz -C ~/Desktop/kwin-patched/ .
+$ tar czf ~/Desktop/kde-patched.tar.gz -C ~/Desktop/kde-patched/ .
 ```
 
 
@@ -2879,7 +2879,7 @@ $ tar czf ~/Desktop/kwin-patched.tar.gz -C ~/Desktop/kwin-patched/ .
 Download and then extract the tar ball on to another machine of the same CPU architecture and KDE version
 
 ```shell
-$ sudo tar xzf kwin-custom.tar.gz -C /
+$ sudo tar xzf kde-patched.tar.gz -C /
 ```
 
 
