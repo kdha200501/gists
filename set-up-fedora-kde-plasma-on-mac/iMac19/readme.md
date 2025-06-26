@@ -76,3 +76,44 @@ $ sudo ./install.cirrus.driver.sh
 $ sudo reboot
 ```
 
+
+
+
+
+##### Increase microphone input volume
+
+> [!TIP]
+>
+> The firmware causes the microphone input volume to be extremely low. The workaround is to apply signal processing filters to obtain a usable mic input
+
+```shell
+$ sudo dnf install easyeffects
+$ easyeffects
+```
+
+Under the "PipeWire" tab
+
+- disable "Use Default Input"
+- choose "Built-in Audio Analog Stereo"
+- disable "Use Default Output"
+- choose "Built-in Audio Analog Stereo"
+
+
+
+Under the "Input" tab -> "Effects" sub-tab, repeat "Add Effect" for
+
+> [!IMPORTANT]
+>
+> Use the grip to reorder these filters in the following order
+
+- Auto gain
+- Limiter
+- Noise Reduction
+- Gate
+
+
+
+```shell
+$ sudo reboot
+```
+
