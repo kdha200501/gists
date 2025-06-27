@@ -996,15 +996,6 @@ Copy and paste:
       }
     },
     {
-      "name": "Windows, tabs and history [continues...]",
-      "application": {
-        "not": ["plasmashell"]
-      },
-      "remap": {
-        "Control-H": "Super-KEY_PAGEDOWN"
-      }
-    },
-    {
       "name": "Runner",
       "remap": {
         "Control-Space": "Alt-Space"
@@ -1023,28 +1014,11 @@ Copy and paste:
       }
     },
     {
-      "name": "File manager",
-      "application": {
-        "only": "dolphin"
-      },
-      "remap": {
-        "Control-Shift-H": "Alt-Home",
-        "Control-Up": "Alt-Up",
-        "Control-BackSpace": "Delete",
-        "Control-I": "Alt-KEY_ENTER",
-        "Control-KEY_COMMA": "Control-Shift-KEY_COMMA",
-        "Alt-Up": "HOME",
-        "Alt-Down": "End"
-      }
-    },
-    {
       "name": "File dialog",
       "application": {
         "only": "org.freedesktop.impl.portal.desktop.kde"
       },
       "remap": {
-        "Control-Shift-H": "Alt-Home",
-        "Control-Up": "Alt-Up",
         "Control-Down": "Enter",
         "Alt-Up": "HOME",
         "Alt-Down": "End",
@@ -1107,8 +1081,9 @@ Copy and paste:
       },
       "remap": {
         "Super-C": "Control_L-Shift-C",
+        "Super-A": "Control_L-Shift-A",
         "Super-E": "Control_L-Shift-E",
-        "Super-A": "Control_L-Shift-A"
+        "Super-Z": "Control_L-Shift-Z"
       }
     }
   ]
@@ -1180,12 +1155,19 @@ Go to "Keyboard" -> "Keyboard"
 
 Launch "System Settings"
 
-Go to "Window Management" -> "Task Switcher" -> "Main"
+Under "Window Management" -> "Task Switcher" -> "Main" -> "All windows"
 
-- set "Forward" to `⌘` + `Tab`
-  - it will be recognized as `Ctrl` + `Tab`
-- set "Reverse" to `⌘` + `Shift` + `Tab`
-  - it will be recognized as `Ctrl` + `Shift` + `Tab`
+- set "Forward" to `⌘+Tab`
+  - it will be recognized as `Ctr+Tab`
+- set "Reverse" to `⌘+Shift+Tab`
+  - it will be recognized as `Ctrl+Shift+Tab`
+
+Under "Window Management" -> "Task Switcher" -> "Main" -> "Current application"
+
+- set "Forward" to ``⌘+` ``
+  - it will be recognized as ``Ctrl+` ``
+- set "Reverse" to ``⌘+shift+` ``
+  - it will be recognized as `Ctrl+~`
 
 
 
@@ -1197,6 +1179,30 @@ Go to "Window Management" -> "Task Switcher" -> "Main"
 
 - select "Large Icons"
 - enable "Only one window per application"
+
+
+
+
+
+##### More on remap shortcuts
+
+Under "System Settings" -> "Keyboard" -> "Shortcuts" -> "File"
+
+- change "Move to Trash" to `⌘+delete`
+  - this will appear as `Ctrl+Backspace`
+
+Under "System Settings" -> "Keyboard" -> "Shortcuts" -> "Navigation"
+
+- change "Up" to `⌘+Up`
+  - this will appear as `Ctrl+Up`
+
+- change "Home" to `⌘+Shift+H`
+  - this will appear as `Ctrl+Shift+H`
+
+Under "System Settings" -> "Keyboard" -> "Shortcuts" -> "Settings"
+
+- change "Configure Application" to `⌘+,`
+  - this will appear as `Ctrl+,`
 
 
 
@@ -2107,9 +2113,9 @@ $ wl-paste | git am
 
 
 
-##### Interpret ctrl+down as open item signal
+##### customize shortcuts
 
-Copy this patch ([link](patches/kde-dolphin/jacks-customizations__interpret_ctrl+down_as_open_item_signal.patch)) and apply
+Copy this patch ([link](patches/kde-dolphin/jacks-customizations__customize_shortcuts.patch)) and apply
 
 ```shell
 $ wl-paste | git am
