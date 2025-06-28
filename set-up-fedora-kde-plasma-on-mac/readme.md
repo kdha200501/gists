@@ -127,40 +127,6 @@ X-KDE-SubstituteUID=false
 
 
 
-# Install *Typora*
-
-*Typroa* is hands down the best *Markdown* editor
-
-> [!TIP]
->
-> License can be purchased on their website, ref: [link](https://typora.io/)
-
-
-
-There is no .rpm release. The easiest way to install is through a unofficial script (ref: [link](https://github.com/RPM-Outpost/typora)):
-
-```shell
-$ cd ~/Downloads
-$ git clone https://github.com/RPM-Outpost/typora.git
-$ cd typora
-$ ./create-package.sh
-$ sudo ln -s /opt/typora/Typora /usr/bin/typora
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Install `vim`
@@ -179,6 +145,56 @@ Add the following:
 set whichwrap+=<,>,h,l,[,]
 syntax on
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Install *Typora*
+
+*Typroa* is hands down the best *Markdown* editor
+
+> [!TIP]
+>
+> License can be purchased on their website, ref: [link](https://typora.io/)
+
+
+
+There is no .rpm release. The easiest way to install is through a unofficial script (ref: [link](https://github.com/RPM-Outpost/typora)):
+
+```shell
+$ cd ~/Downloads
+$ git clone https://github.com/RPM-Outpost/typora.git
+$ cd typora
+$ ./create-package.sh
+$ sudo ln -s /opt/typora/Typora /usr/bin/typora
+$ vim ~/.config/Typora/conf/conf.user.json
+```
+
+Add to `keyBinding`
+
+```json
+{
+	"Find Next": "Ctrl+G",
+	"Find Previous": "Ctrl+Shift+G"
+}
+```
+
+
+
+
 
 
 
@@ -1057,15 +1073,6 @@ Copy and paste:
         "Control-9": "Control-Shift-9",
         "Control-1": ["Control-K", "Control-B"],
         "Control-L": "Control-G"
-      }
-    },
-    {
-      "name": "Typora",
-      "application": {
-        "only": "Typora"
-      },
-      "remap": {
-        "Control-G": "F3"
       }
     },
     {
