@@ -996,12 +996,6 @@ Copy and paste:
       }
     },
     {
-      "name": "Runner",
-      "remap": {
-        "Control-Space": "Alt-Space"
-      }
-    },
-    {
       "name": "Screenshot",
       "remap": {
         "Control-Shift-4": "Super-Shift-KEY_PRINT"
@@ -1204,7 +1198,10 @@ Under "System Settings" -> "Keyboard" -> "Shortcuts" -> "Settings"
 - change "Configure Application" to `⌘+,`
   - this will appear as `Ctrl+,`
 
+Under "System Settings" -> "Keyboard" -> "Shortcuts" -> "KRunner"
 
+- change "Launch" to `⌘+Space`
+  - this will appear as `Ctrl+Space`
 
 
 
