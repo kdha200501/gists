@@ -1075,12 +1075,7 @@ Copy and paste:
         "only": "konsole"
       },
       "remap": {
-        "Super-C": "Control_L-C",
-        "Super-A": "Control_L-A",
-        "Super-E": "Control_L-E",
         "Super-Z": "Control_L-Z",
-        "Control-C": "Control_L-Shift-C",
-        "Control-V": "Control_L-Shift-V",
         "Control-T": "Control_L-Shift_L-T",
         "Control-N": "Control_L-Shift_L-N",
         "Control-W": "Control_L-Shift_L-W",
@@ -1223,6 +1218,31 @@ Under "System Settings" -> "Keyboard" -> "Shortcuts" -> "KRunner"
 
 - change "Launch" to `⌘+Space`
   - this will appear as `Ctrl+Space`
+
+Under `Konsole` -> "Settings" -> "Configure Keyboard Shortcuts"
+
+- search for "ctrl+shift+c"
+  - change to `⌘+C`
+    - this will appear as `Ctrl+C`
+- search for "ctrl+shift+v"
+  - change to `⌘+V`
+    - this will appear as `Ctrl+V`
+- search for "ctrl+shift+n"
+  - change to `⌘+N`
+    - this will appear as `Ctrl+N`
+- search for "ctrl+shift+t"
+  - change to `⌘+T`
+    - this will appear as `Ctrl+T`
+- search for "ctrl+shift+w"
+  - change to `⌘+W`
+    - this will appear as `Ctrl+W`
+- search for "ctrl+shift+a"
+  - remove this shortcut
+
+- search for "ctrl+shift+z"
+  - remove this shortcut
+
+
 
 
 

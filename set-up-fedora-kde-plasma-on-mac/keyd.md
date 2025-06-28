@@ -47,8 +47,17 @@ meta = layer(hold_control)
 # [hold control] override #
 ###########################
 [hold_meta:M]
+
+# virtual desktop navigation
 left = M-C-left
 right = M-C-right
+
+# terminal
+c = C-S-c
+a = C-S-a
+e = C-S-e
+z = C-S-z
+l = C-S-l
 
 ######################
 # [hold ⌘] override #
