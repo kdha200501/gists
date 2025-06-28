@@ -348,7 +348,7 @@ Install `prettier-atom` and `atom-runner` from the package manager within *Pulsa
 
 
 
-Aliases *Pulsar* as Atom
+##### Aliases *Pulsar* as Atom
 
 ```shell
 $ vim ~/.bashrc
@@ -376,6 +376,40 @@ Exec=pulsar %F
 Icon=pulsar
 Type=Application
 Categories=Development;
+```
+
+
+
+##### Customize shortcuts
+
+```shell
+$ atom ~/.pulsar/keymap.cson
+```
+
+Copy and paste:
+
+```yaml
+'atom-text-editor':
+  'ctrl-shift-p': 'prettier:format'
+  'ctrl-l': 'unset!'
+'.platform-darwin, .platform-win32, .platform-linux':
+  'ctrl-l': 'go-to-line:toggle'
+'.platform-win32 atom-text-editor, .platform-linux atom-text-editor':
+  'ctrl-shift-r': 'run:file'
+  'ctrl-g': 'find-and-replace:find-next'
+  'ctrl-shift-g': 'find-and-replace:find-previous-selected'
+'atom-workspace atom-text-editor:not([mini])':
+  'alt-shift-up': 'editor:move-line-up'
+  'alt-shift-down': 'editor:move-line-down'
+  'ctrl-d': 'editor:duplicate-lines'
+'.platform-linux':
+  'ctrl-shift-n': 'fuzzy-finder:toggle-file-finder'
+'body':
+  'ctrl-t': 'application:new-file'
+'.workspace':
+  'ctrl-9': 'github:toggle-git-tab'
+'.platform-win32, .platform-linux':
+  'ctrl-1': 'tree-view:toggle'
 ```
 
 
@@ -1053,26 +1087,6 @@ Copy and paste:
         "Control-Q": "Alt_L-F4",
         "Control-Shift-KEY_LEFTBRACE": "Shift_L-Left",
         "Control-Shift-KEY_RIGHTBRACE": "Shift_L-Right"
-      }
-    },
-    {
-      "name": "Atom",
-      "application": {
-        "only": ["Pulsar", "Atom"]
-      },
-      "remap": {
-        "Control-Shift-P": "Control-Alt-F",
-        "Control-Shift-R": "Alt-R",
-        "Control-G": "F3",
-        "Alt-Shift-Up": "Control-Up",
-        "Alt-Shift-Down": "Control-Down",
-        "Control-D": "Control-Shift-D",
-        "Control-Shift-N": "Control-P",
-        "Control-N": "Control-Shift-N",
-        "Control-T": "Control-N",
-        "Control-9": "Control-Shift-9",
-        "Control-1": ["Control-K", "Control-B"],
-        "Control-L": "Control-G"
       }
     },
     {
