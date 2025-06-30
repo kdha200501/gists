@@ -1,0 +1,137 @@
+From: Jacks Diao <kdha200501@gmail.com>
+Subject: [PATCH] jacks-customizations: customize shortcuts
+---
+Index: src/dolphinmainwindow.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/dolphinmainwindow.cpp b/src/dolphinmainwindow.cpp
+--- a/src/dolphinmainwindow.cpp	(revision 86e5b368820af7d4d7455ccae039ba0714f127dc)
++++ b/src/dolphinmainwindow.cpp	(revision a9dbde0bd2710abca0b68d3768e8d3dcba6e82a4)
+@@ -1840,7 +1840,7 @@
+                                        "There you can enter text to filter the files and folders currently displayed. "
+                                        "Only those that contain the text in their name will be kept in view."));
+     showFilterBar->setIcon(QIcon::fromTheme(QStringLiteral("view-filter")));
+-    actionCollection()->setDefaultShortcuts(showFilterBar, {Qt::CTRL | Qt::Key_I, Qt::Key_Slash});
++    actionCollection()->setDefaultShortcuts(showFilterBar, {Qt::Key_Slash});
+     connect(showFilterBar, &QAction::triggered, this, &DolphinMainWindow::showFilterBar);
+
+     // toggle_filter acts as a copy of the main showFilterBar to be used mainly
+Index: src/dolphinviewcontainer.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/dolphinviewcontainer.cpp b/src/dolphinviewcontainer.cpp
+--- a/src/dolphinviewcontainer.cpp	(revision 86e5b368820af7d4d7455ccae039ba0714f127dc)
++++ b/src/dolphinviewcontainer.cpp	(revision a9dbde0bd2710abca0b68d3768e8d3dcba6e82a4)
+@@ -749,7 +749,13 @@
+         if (modifiers & Qt::ControlModifier && modifiers & Qt::ShiftModifier) {
+             Q_EMIT activeTabRequested(url);
+         } else if (modifiers & Qt::ControlModifier) {
+-            Q_EMIT tabRequested(url);
++            const auto mouseButtons = QGuiApplication::mouseButtons();
++
++            if (mouseButtons & Qt::LeftButton) {
++                Q_EMIT tabRequested(url);
++            } else {
++                setUrl(url);
++            }
+         } else if (modifiers & Qt::ShiftModifier) {
+             Dolphin::openNewWindow({KFilePlacesModel::convertedUrl(url)}, this);
+         } else {
+Index: src/kitemviews/kitemlistcontroller.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/kitemviews/kitemlistcontroller.cpp b/src/kitemviews/kitemlistcontroller.cpp
+--- a/src/kitemviews/kitemlistcontroller.cpp	(revision 86e5b368820af7d4d7455ccae039ba0714f127dc)
++++ b/src/kitemviews/kitemlistcontroller.cpp	(revision a9dbde0bd2710abca0b68d3768e8d3dcba6e82a4)
+@@ -284,6 +284,7 @@
+     }
+
+     const bool controlPressed = event->modifiers() & Qt::ControlModifier;
++    const bool optionPressed = event->modifiers() & Qt::AltModifier;
+     if (m_selectionMode && !controlPressed && !shiftPressed && (key == Qt::Key_Enter || key == Qt::Key_Return)) {
+         key = Qt::Key_Space; // In selection mode one moves around with arrow keys and toggles selection with Enter.
+     }
+@@ -322,18 +323,6 @@
+     }
+
+     switch (key) {
+-    case Qt::Key_Home:
+-        index = 0;
+-        m_keyboardAnchorIndex = index;
+-        m_keyboardAnchorPos = keyboardAnchorPos(index);
+-        break;
+-
+-    case Qt::Key_End:
+-        index = itemCount - 1;
+-        m_keyboardAnchorIndex = index;
+-        m_keyboardAnchorPos = keyboardAnchorPos(index);
+-        break;
+-
+     case Qt::Key_Left:
+         if (index > 0) {
+             const int expandedParentsCount = m_model->expandedParentsCount(index);
+@@ -359,6 +348,13 @@
+         break;
+
+     case Qt::Key_Up:
++        if (optionPressed) {
++            index = 0;
++            m_keyboardAnchorIndex = index;
++            m_keyboardAnchorPos = keyboardAnchorPos(index);
++            break;
++        }
++
+         updateKeyboardAnchor();
+         if (shiftPressed && !m_selectionManager->isAnchoredSelectionActive() && m_selectionManager->isSelected(index)) {
+             m_selectionManager->beginAnchoredSelection(index);
+@@ -367,6 +363,27 @@
+         break;
+
+     case Qt::Key_Down:
++        if(controlPressed) {
++            const KItemSet selectedItems = m_selectionManager->selectedItems();
++            if (selectedItems.count() >= 2) {
++              Q_EMIT itemsActivated(selectedItems);
++            } else if (selectedItems.count() == 1) {
++              Q_EMIT itemActivated(selectedItems.first());
++            } else {
++              Q_EMIT itemActivated(index);
++            }
++
++            event->ignore();
++            return true;
++        }
++
++        if(optionPressed) {
++            index = itemCount - 1;
++            m_keyboardAnchorIndex = index;
++            m_keyboardAnchorPos = keyboardAnchorPos(index);
++            break;
++        }
++
+         updateKeyboardAnchor();
+         if (shiftPressed && !m_selectionManager->isAnchoredSelectionActive() && m_selectionManager->isSelected(index)) {
+             m_selectionManager->beginAnchoredSelection(index);
+Index: src/views/dolphinviewactionhandler.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/views/dolphinviewactionhandler.cpp b/src/views/dolphinviewactionhandler.cpp
+--- a/src/views/dolphinviewactionhandler.cpp	(revision 86e5b368820af7d4d7455ccae039ba0714f127dc)
++++ b/src/views/dolphinviewactionhandler.cpp	(revision a9dbde0bd2710abca0b68d3768e8d3dcba6e82a4)
+@@ -151,7 +151,7 @@
+                                           "You can configure advanced options there like managing "
+                                           "read- and write-permissions."));
+     propertiesAction->setIcon(QIcon::fromTheme(QStringLiteral("document-properties")));
+-    m_actionCollection->setDefaultShortcuts(propertiesAction, {Qt::ALT | Qt::Key_Return, Qt::ALT | Qt::Key_Enter});
++    m_actionCollection->setDefaultShortcuts(propertiesAction, {Qt::CTRL | Qt::Key_I});
+     connect(propertiesAction, &QAction::triggered, this, &DolphinViewActionHandler::slotProperties);
+
+     QAction *copyPathAction = m_actionCollection->addAction(QStringLiteral("copy_location"));
