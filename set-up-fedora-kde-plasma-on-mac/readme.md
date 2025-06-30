@@ -162,56 +162,6 @@ syntax on
 
 
 
-# Install *Typora*
-
-*Typroa* is hands down the best *Markdown* editor
-
-> [!TIP]
->
-> License can be purchased on their website, ref: [link](https://typora.io/)
-
-
-
-There is no .rpm release. The easiest way to install is through a unofficial script (ref: [link](https://github.com/RPM-Outpost/typora)):
-
-```shell
-$ cd ~/Downloads
-$ git clone https://github.com/RPM-Outpost/typora.git
-$ cd typora
-$ ./create-package.sh
-$ sudo ln -s /opt/typora/Typora /usr/bin/typora
-$ vim ~/.config/Typora/conf/conf.user.json
-```
-
-Add to `keyBinding`
-
-```json
-{
-	"Find Next": "Ctrl+G",
-	"Find Previous": "Ctrl+Shift+G"
-}
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Install `wl-clipboard`
 
 A command line utility to pipe `stdout` into clipboard and pipe clipboard into `stdin`
@@ -236,180 +186,6 @@ alias pbpaste='wl-paste'
 
 ```shell
 $ pbcopy "$(git format-patch -1 <commit-hash> --stdout)"
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Install *Atom*
-
-*Atom* is the most hack-able text editor
-
-
-
-##### Install `nvm`
-
-```shell
-$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-$ source ~/.bashrc
-
-$ nvm -v
-```
-
-
-
-
-
-##### Install *Node.js* and its package manager
-
-```shell
-$ nvm install 18.20
-
-$ node -v
-$ npm -v
-```
-
-
-
-
-
-> [!WARNING]
->
-> *Atom* is no longer under development and it can no longer be installed in *Fedora* due to missing dependencies. Skip the remaining steps and see *Pulsar* below
-
-##### Install *Atom*
-
-Download `atom.x86_64.rpm` from *GitHub* (ref: [link](https://github.com/atom/atom/releases/tag/v1.60.0)) and install
-
-
-
-
-
-##### Install *Atom* plug-ins
-
-- `prettier-atom` ref: [link](https://github.com/prettier/prettier-atom/tags)
-- `atom-runner` ref: [link](https://github.com/lsegal/atom-runner/tags)
-
-```shell
-$ mkdir ~/.atom/packages
-
-$ cd ~/.atom/packages
-$ git clone https://github.com/lsegal/atom-runner.git
-$ cd atom-runner
-$ npm i
-
-$ cd ~/.atom/packages
-$ git clone https://github.com/prettier/prettier-atom.git
-$ cd prettier-atom
-$ npm i
-$ npm audit fix --force
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Install *Pulsar*
-
-> [!TIP]
->
-> The team behind Pulsar is a community that came about naturally after the announcement of [Atom's Sunset](https://github.blog/2022-06-08-sunsetting-atom/) and decided that they needed to do something about it to keep their favourite editor alive.
-
-
-
-Download the .rpm release from *Pulsar* (ref: [link](https://pulsar-edit.dev/download.html#regular-releases)) and install
-
-Install `prettier-atom` and `atom-runner` from the package manager within *Pulsar*
-
-
-
-##### Aliases *Pulsar* as Atom
-
-```shell
-$ vim ~/.bashrc
-```
-
-Add
-
-```shell
-alias atom=pulsar
-```
-
-
-
-```shell
-$ touch ~/.local/share/applications/pulsar.desktop
-$ vim ~/.local/share/applications/pulsar.desktop
-```
-
-Copy and paste:
-
-```shell
-[Desktop Entry]
-Name=Atom
-Exec=pulsar %F
-Icon=pulsar
-Type=Application
-Categories=Development;
-```
-
-
-
-##### Customize shortcuts
-
-```shell
-$ atom ~/.pulsar/keymap.cson
-```
-
-Copy and paste:
-
-```yaml
-'atom-text-editor':
-  'ctrl-shift-p': 'prettier:format'
-  'ctrl-l': 'unset!'
-'.platform-darwin, .platform-win32, .platform-linux':
-  'ctrl-l': 'go-to-line:toggle'
-'.platform-win32 atom-text-editor, .platform-linux atom-text-editor':
-  'ctrl-shift-r': 'run:file'
-  'ctrl-g': 'find-and-replace:find-next'
-  'ctrl-shift-g': 'find-and-replace:find-previous-selected'
-'atom-workspace atom-text-editor:not([mini])':
-  'alt-shift-up': 'editor:move-line-up'
-  'alt-shift-down': 'editor:move-line-down'
-  'ctrl-d': 'editor:duplicate-lines'
-'.platform-linux':
-  'ctrl-shift-n': 'fuzzy-finder:toggle-file-finder'
-'body':
-  'ctrl-t': 'application:new-file'
-'.workspace':
-  'ctrl-9': 'github:toggle-git-tab'
-'.platform-win32, .platform-linux':
-  'ctrl-1': 'tree-view:toggle'
 ```
 
 
@@ -470,6 +246,28 @@ Apply changes:
 $ sudo dracut --force
 $ sudo reboot
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Turn on number lock upon user log in
+
+Under "System Settings" -> "Keyboard" -> "Keyboard"
+
+- set "NumLock on startup" to "Turn on"
 
 
 
@@ -855,307 +653,154 @@ $ sudo dnf install facetimehd
 
 
 
-# Install utility to identify key names [optional]
-
-These utilities are useful for learning how to remap keys
-
-
-
-
-
-##### Approach 1: Use `wev`
-
-This is the `wayland` version of `ev`
-
-```shell
-$ sudo dnf copr enable wef/wev -y
-$ sudo dnf install wev
-
-$ wev
-```
-
-
-
-
-
-##### Approach 2: Learn from the source code of `evdev`
-
-ref: [link](https://github.com/emberian/evdev/blob/main/src/scancodes.rs)
-
-also see: `/usr/include/linux/input-event-codes.h`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Grant the current user access to `/dev/input/`
-
-`xremap`needs this permission
-
-> [!TIP]
->
-> - we need `xremap` for remapping keyboard shortcuts
-
-
-
-
-
-##### Add the current user to the `input` group
-
-```shell
-$ sudo gpasswd -a $USER input
-$ newgrp input
-
-$ groups
-```
-
-
-
-
-
-##### Give the `input` group the permissions to read and write to `/dev/input/`
-
-> [!IMPORTANT]
->
-> this will allow the current user to run  `xremap` without root permission
-
-```shell
-$ echo 'KERNEL=="uinput", MODE="0660", GROUP="input", OPTIONS+="static_node=uinput"' | sudo tee /etc/udev/rules.d/input.rules
-$ sudo reboot
-
-$ ls -la /dev/uinput
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Remap keyboard shortcuts
 
-While some *Linux* shortcuts are easy to learn, most are not. The more effective way is to port *macOS* shortcuts to *Linux*.
-
-
-
-##### Install `rust` and its package manager
-
-```shell
-$ sudo dnf install rust cargo
-$ atom ~/.bashrc
-```
-
-Add the following:
-
-```shell
-export PATH=$PATH:~/.cargo/bin/
-```
-
-```shell
-$ source  ~/.bashrc
-```
+KDE and macOS have a significant amount of similar shortcuts and these shortcuts differ in the modifier, only. As a result, the most efficient approach to transplant macOS shortcuts to KDE is to swap the `⌘` key and the `control` key when they are held.
 
 
 
 
 
-##### Install `xremap`
-
-```shell
-$ cargo install xremap --features kde
-```
+##### Install `keyd`
 
 > [!TIP]
 >
-> note: installs to the current user
-
-
-
-
-
-##### Configure `xremap`
+> `keyd` re-augments shortcuts before they hit the compositor layer, it does not require the `$USER` to be added to the `input` group
 
 ```shell
-$ mkdir ~/.xremap
-$ touch ~/.xremap/config.json
-$ atom ~/.xremap/config.json
+$ sudo dnf copr enable fmonteghetti/keyd
+$ sudo dnf install keyd
+
+$ sudo mkdir /etc/keyd/
+$ sudo touch /etc/keyd/default.conf
+$ sudo vim /etc/keyd/default.conf
 ```
 
 Copy and paste:
 
-```json
-{
-  "modmap": [
-    {
-      "name": "Convert the meta keys to the control keys",
-      "remap": {
-        "Super_L": "Control_L",
-        "Super_R": "Control_R",
-        "Control_L": "Super_L",
-        "Control_R": "Super_R"
-      }
-    }
-  ],
-  "keymap": [
-    {
-      "name": "Text navigation",
-      "remap": {
-        "Control-Left": "Home",
-        "Control-Right": "End",
-        "Alt-Left": "Control-Left",
-        "Alt-Right": "Control-Right"
-      }
-    },
-    {
-      "name": "Windows, tabs and history",
-      "remap": {
-        "Control-Q": "Alt-F4",
-        "Control-Shift-KEY_RIGHTBRACE": "Control-KEY_PAGEDOWN",
-        "Control-Shift-KEY_LEFTBRACE": "Control-KEY_PAGEUP",
-        "Control-KEY_RIGHTBRACE": "Alt-Right",
-        "Control-KEY_LEFTBRACE": "Alt-Left",
-        "Control-M": "Super-KEY_PAGEDOWN",
-        "Super-Right": "Super-Control-Right",
-        "Super-LEFT": "Super-Control-Left",
-        "Super-Up": "Super-Control-Up",
-        "Super-Down": "Super-Control-Down",
-        "F11": "Control-F12",
-        "F3": "Control-F9"
-      }
-    },
-    {
-      "name": "Screenshot",
-      "remap": {
-        "Control-Shift-4": "Super-Shift-KEY_PRINT"
-      }
-    },
-    {
-      "name": "Unwanted shortcuts",
-      "remap": {
-        "Super-L": "Control-L"
-      }
-    },
-    {
-      "name": "File dialog",
-      "application": {
-        "only": "org.freedesktop.impl.portal.desktop.kde"
-      },
-      "remap": {
-        "Control-Down": "Enter",
-        "Alt-Up": "HOME",
-        "Alt-Down": "End",
-        "F2": "Enter"
-      }
-    },
-    {
-      "name": "Terminal",
-      "application": {
-        "only": "konsole"
-      },
-      "remap": {
-        "Super-Z": "Control_L-Z",
-        "Control-T": "Control_L-Shift_L-T",
-        "Control-N": "Control_L-Shift_L-N",
-        "Control-W": "Control_L-Shift_L-W",
-        "Control-Q": "Alt_L-F4",
-        "Control-Shift-KEY_LEFTBRACE": "Shift_L-Left",
-        "Control-Shift-KEY_RIGHTBRACE": "Shift_L-Right"
-      }
-    },
-    {
-      "name": "Webstorm",
-      "application": {
-        "only": "jetbrains-webstorm"
-      },
-      "remap": {
-        "Super-C": "Control_L-Shift-C",
-        "Super-A": "Control_L-Shift-A",
-        "Super-E": "Control_L-Shift-E",
-        "Super-Z": "Control_L-Shift-Z"
-      }
-    }
-  ]
-}
+```shell
+[ids]
+*
+
+[main]
+
+##########################
+# Non-modifier shortcuts #
+##########################
+
+# show desktop
+f11 = C-f12
+
+# exposé
+f3 = C-f9
+
+
+
+
+###############################
+# [hold control] -> [hold ⌘] #
+###############################
+control = layer(hold_meta)
+
+
+
+
+###############################
+# [hold ⌘] -> [hold control] #
+###############################
+meta = layer(hold_control)
+
+
+
+
+############################################
+# [hold control] inheritance and overrides #
+############################################
+[hold_meta:M]
+
+# virtual desktop navigation
+left = M-C-left
+right = M-C-right
+
+# terminal
+c = C-S-c
+a = C-S-a
+e = C-S-e
+z = C-S-z
+l = C-S-l
+
+
+
+
+###########################################
+# [hold control+shift] -> [hold ⌘+shift] #
+###########################################
+[hold_meta+shift]
+
+# IDE
+up = C-S-up
+down = C-S-down
+
+
+#######################################
+# [hold ⌘] inheritance and overrides #
+#######################################
+[hold_control:C]
+
+# quit application
+q = A-f4
+
+# zoom
+minus = C-minus
+equal = C-equal
+
+# history navigation
+] = A-right
+[ = A-left
+
+# text navigation
+left = home
+right = end
+
+
+
+
+###########################################
+# [hold ⌘+shift] -> [hold control+shift] #
+###########################################
+[hold_control+shift]
+
+# tab navigation
+] = C-pagedown
+[ = C-pageup
+
+# screenshot
+4 = M-S-print
+
+
+
+
+##########################
+# [hold option] override #
+##########################
+[alt]
+
+# word navigation
+left = C-left
+right = C-right
 ```
 
 
-
-
-
-##### Test out `xremap` [optional]
-
-The print out at runtime is especially useful determining what applications are called *i.e.* the "class" property is the application name
 
 ```shell
-$ xremap ~/.xremap/config.json
-```
-
-
-
-
-
-##### Run `xremap` upon user log in
-
-```shell
-$ touch ~/.xremap/launch.sh
-$ chmod u+x ~/.xremap/launch.sh
-$ atom ~/.xremap/launch.sh
-```
-
-Add the following:
-
-```sh
-#!/bin/bash
-~/.cargo/bin/xremap --watch ~/.xremap/config.json > /dev/null 2>&1
+$ sudo systemctl enable keyd
+$ sudo systemctl start keyd
+$ systemctl status keyd
 ```
 
 > [!TIP]
 >
-> the `--watch` option tells xremap to watch for newly added keyboards and apply the same remapping
-
-Launch "System Settings"
-
-Go to "Autostart" -> "Add" -> "Add Login Script"
-
-Choose `launch.sh`
-
-```shell
-$ sudo reboot
-```
-
-
-
-
-
-##### Turn on number lock upon user log in
-
-Launch "System Settings"
-
-Go to "Keyboard" -> "Keyboard"
-
-- set "NumLock on startup" to "Turn on"
+> Use `$ sudo systemctl restart keyd` to restart
 
 
 
@@ -1241,6 +886,226 @@ Under `Konsole` -> "Settings" -> "Configure Keyboard Shortcuts"
 
 - search for "ctrl+shift+z"
   - remove this shortcut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Install *Typora*
+
+*Typroa* is hands down the best *Markdown* editor
+
+> [!TIP]
+>
+> License can be purchased on their website, ref: [link](https://typora.io/)
+
+
+
+There is no .rpm release. The easiest way to install is through a unofficial script (ref: [link](https://github.com/RPM-Outpost/typora)):
+
+```shell
+$ cd ~/Downloads
+$ git clone https://github.com/RPM-Outpost/typora.git
+$ cd typora
+$ ./create-package.sh
+$ sudo ln -s /opt/typora/Typora /usr/bin/typora
+$ vim ~/.config/Typora/conf/conf.user.json
+```
+
+Add to `keyBinding`
+
+```json
+{
+	"Find Next": "Ctrl+G",
+	"Find Previous": "Ctrl+Shift+G"
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Install *Atom*
+
+*Atom* is the most hack-able text editor
+
+
+
+##### Install `nvm`
+
+```shell
+$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+$ source ~/.bashrc
+
+$ nvm -v
+```
+
+
+
+
+
+##### Install *Node.js* and its package manager
+
+```shell
+$ nvm install 18.20
+
+$ node -v
+$ npm -v
+```
+
+
+
+
+
+> [!WARNING]
+>
+> *Atom* is no longer under development and it can no longer be installed in *Fedora* due to missing dependencies. Skip the remaining steps and see *Pulsar* below
+
+##### Install *Atom*
+
+Download `atom.x86_64.rpm` from *GitHub* (ref: [link](https://github.com/atom/atom/releases/tag/v1.60.0)) and install
+
+
+
+
+
+##### Install *Atom* plug-ins
+
+- `prettier-atom` ref: [link](https://github.com/prettier/prettier-atom/tags)
+- `atom-runner` ref: [link](https://github.com/lsegal/atom-runner/tags)
+
+```shell
+$ mkdir ~/.atom/packages
+
+$ cd ~/.atom/packages
+$ git clone https://github.com/lsegal/atom-runner.git
+$ cd atom-runner
+$ npm i
+
+$ cd ~/.atom/packages
+$ git clone https://github.com/prettier/prettier-atom.git
+$ cd prettier-atom
+$ npm i
+$ npm audit fix --force
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Install *Pulsar*
+
+> [!TIP]
+>
+> The team behind Pulsar is a community that came about naturally after the announcement of [Atom's Sunset](https://github.blog/2022-06-08-sunsetting-atom/) and decided that they needed to do something about it to keep their favourite editor alive.
+
+
+
+Download the .rpm release from *Pulsar* (ref: [link](https://pulsar-edit.dev/download.html#regular-releases)) and install
+
+Install `prettier-atom` and `atom-runner` from the package manager within *Pulsar*
+
+
+
+##### Aliases *Pulsar* as Atom
+
+```shell
+$ vim ~/.bashrc
+```
+
+Add
+
+```shell
+alias atom=pulsar
+```
+
+
+
+```shell
+$ touch ~/.local/share/applications/pulsar.desktop
+$ vim ~/.local/share/applications/pulsar.desktop
+```
+
+Copy and paste:
+
+```shell
+[Desktop Entry]
+Name=Atom
+Exec=pulsar %F
+Icon=pulsar
+Type=Application
+Categories=Development;
+```
+
+
+
+##### Customize shortcuts
+
+```shell
+$ atom ~/.pulsar/keymap.cson
+```
+
+Copy and paste:
+
+```yaml
+'atom-text-editor':
+  'ctrl-shift-p': 'prettier:format'
+  'ctrl-l': 'unset!'
+'.platform-darwin, .platform-win32, .platform-linux':
+  'ctrl-l': 'go-to-line:toggle'
+'.platform-win32 atom-text-editor, .platform-linux atom-text-editor':
+  'ctrl-shift-r': 'run:file'
+  'ctrl-g': 'find-and-replace:find-next'
+  'ctrl-shift-g': 'find-and-replace:find-previous-selected'
+'atom-workspace atom-text-editor:not([mini])':
+  'alt-shift-up': 'editor:move-line-up'
+  'alt-shift-down': 'editor:move-line-down'
+  'ctrl-d': 'editor:duplicate-lines'
+'.platform-linux':
+  'ctrl-shift-n': 'fuzzy-finder:toggle-file-finder'
+'body':
+  'ctrl-t': 'application:new-file'
+'.workspace':
+  'ctrl-9': 'github:toggle-git-tab'
+'.platform-win32, .platform-linux':
+  'ctrl-1': 'tree-view:toggle'
+```
 
 
 
