@@ -1,0 +1,110 @@
+From: Jacks Diao <kdha200501@gmail.com>
+Subject: [PATCH] jacks-customizations: customize shortcuts
+---
+Index: src/filewidgets/kdiroperator.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/filewidgets/kdiroperator.cpp b/src/filewidgets/kdiroperator.cpp
+--- a/src/filewidgets/kdiroperator.cpp	(revision 4fa12bce88718863c75cf50ac215b9d0ce4d7779)
++++ b/src/filewidgets/kdiroperator.cpp	(revision 319effeb40cf84d9eeb576d89197a1a0b51afa94)
+@@ -1432,6 +1432,53 @@
+     }
+     case QEvent::KeyPress: {
+         QKeyEvent *evt = static_cast<QKeyEvent *>(event);
++
++        if (evt->key() == Qt::Key_Down && evt->modifiers() == Qt::ControlModifier) {
++            QModelIndex index = d->m_itemView->currentIndex();
++            d->slotActivated(index);
++            return true; // handled
++        }
++
++        if (evt->key() == Qt::Key_Up && evt->modifiers() == Qt::AltModifier) {
++            QItemSelectionModel *selModel = d->m_itemView->selectionModel();
++
++            if(!selModel) {
++                return true; // handled
++            }
++
++            int rowCount = d->m_proxyModel->rowCount();
++
++            if(rowCount == 0) {
++                return true; // handled
++            }
++
++            QModelIndex index = d->m_proxyModel->index(0, 0);
++            selModel->clear();
++            selModel->setCurrentIndex(index, QItemSelectionModel::Select);
++            d->m_itemView->scrollTo(index, QAbstractItemView::PositionAtTop);
++            return true; // handled
++        }
++
++        if (evt->key() == Qt::Key_Down && evt->modifiers() == Qt::AltModifier) {
++            QItemSelectionModel *selModel = d->m_itemView->selectionModel();
++
++            if(!selModel) {
++                return true; // handled
++            }
++
++            int rowCount = d->m_proxyModel->rowCount();
++
++            if(rowCount == 0) {
++                return true; // handled
++            }
++
++            QModelIndex index = d->m_proxyModel->index(rowCount - 1, 0);
++            selModel->clear();
++            selModel->setCurrentIndex(index, QItemSelectionModel::Select);
++            d->m_itemView->scrollTo(index, QAbstractItemView::PositionAtTop);
++            return true; // handled
++        }
++
+         if (evt->key() == Qt::Key_Return || evt->key() == Qt::Key_Enter) {
+             // when no elements are selected and Return/Enter is pressed
+             // emit keyEnterReturnPressed
+@@ -2252,7 +2299,7 @@
+     action = new QAction(i18n("Properties"), this);
+     d->m_actions[Properties] = action;
+     action->setIcon(QIcon::fromTheme(QStringLiteral("document-properties")));
+-    action->setShortcut(Qt::ALT | Qt::Key_Return);
++    action->setShortcut(Qt::ControlModifier | Qt::Key_I);
+     connect(action, &QAction::triggered, this, [this]() {
+         d->slotProperties();
+     });
+@@ -2705,7 +2752,7 @@
+     KFileItem item = m_dirModel->itemForIndex(dirIndex);
+
+     const Qt::KeyboardModifiers modifiers = QApplication::keyboardModifiers();
+-    if (item.isNull() || (modifiers & Qt::ShiftModifier) || (modifiers & Qt::ControlModifier)) {
++    if (item.isNull() || (modifiers & Qt::ShiftModifier)) {
+         return;
+     }
+
+Index: src/filewidgets/kfilewidget.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/filewidgets/kfilewidget.cpp b/src/filewidgets/kfilewidget.cpp
+--- a/src/filewidgets/kfilewidget.cpp	(revision 4fa12bce88718863c75cf50ac215b9d0ce4d7779)
++++ b/src/filewidgets/kfilewidget.cpp	(revision 319effeb40cf84d9eeb576d89197a1a0b51afa94)
+@@ -1220,12 +1220,12 @@
+         toggleBookmarks(show);
+     });
+
+-    m_toggleQuickFilterAction = new KToggleAction(i18n("Show Quick Filter"), q);
+-    q->addAction(m_toggleQuickFilterAction);
+-    m_toggleQuickFilterAction->setShortcuts(QList{QKeySequence(Qt::CTRL | Qt::Key_I), QKeySequence(Qt::Key_Backslash)});
+-    q->connect(m_toggleQuickFilterAction, &QAction::toggled, q, [this](bool show) {
+-        setQuickFilterVisible(show);
+-    });
++//     m_toggleQuickFilterAction = new KToggleAction(i18n("Show Quick Filter"), q);
++//     q->addAction(m_toggleQuickFilterAction);
++//     m_toggleQuickFilterAction->setShortcuts(QList{QKeySequence(Qt::CTRL | Qt::Key_I), QKeySequence(Qt::Key_Backslash)});
++//     q->connect(m_toggleQuickFilterAction, &QAction::toggled, q, [this](bool show) {
++//         setQuickFilterVisible(show);
++//     });
+
+     // Build the settings menu
+     KActionMenu *menu = new KActionMenu(QIcon::fromTheme(QStringLiteral("configure")), i18n("Options"), q);
