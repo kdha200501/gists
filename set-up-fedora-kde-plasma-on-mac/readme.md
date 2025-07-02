@@ -1897,9 +1897,9 @@ $ cmake ..
 
 
 
-##### Use list view in file dialog
+##### One focus at a time
 
-Copy this patch ([link](patches/kde-kio/jacks-customizations__use_list_view_in_file_dialog.patch)) and apply
+Copy this patch ([link](patches/kde-kio/jacks-customizations__one_focus_at_a_time.patch)) and apply
 
 ```shell
 $ wl-paste | git am
@@ -1921,9 +1921,21 @@ $ wl-paste | git am
 
 
 
-##### One focus at a time
+##### Use list view in file dialog
 
-Copy this patch ([link](patches/kde-kio/jacks-customizations__one_focus_at_a_time.patch)) and apply
+Copy this patch ([link](patches/kde-kio/jacks-customizations__use_list_view_in_file_dialog.patch)) and apply
+
+```shell
+$ wl-paste | git am
+```
+
+
+
+
+
+##### Customize shortcuts
+
+Copy this patch ([link](patches/kde-kio/jacks-customizations__customize_shortcuts.patch)) and apply
 
 ```shell
 $ wl-paste | git am
