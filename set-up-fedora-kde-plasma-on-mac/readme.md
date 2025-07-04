@@ -2246,14 +2246,11 @@ $ plasmashell --replace
 
 The best *IDE* for front end development
 
-
-
-Follow the "Installation instructions" on the download page, ref: [link](https://www.jetbrains.com/webstorm/download/#section=linux)
-
 ```shell
 $ sudo mkdir /opt/webstorm
-$ sudo mv WebStorm-XXX.YYYYY.ZZZ/ /opt/webstorm
-$ sudo ln -s /opt/webstorm/WebStorm-XXX.YYYYY.ZZZ/bin/webstorm /usr/bin
+$ sudo tar xzf ~/Downloads/WebStorm-XXX.Y.Z.tar.gz -C /opt/webstorm/
+$ sudo ln -s /opt/webstorm/WebStorm-XXX.YYYYY.ZZZ/bin/webstorm /usr/bin/
+
 $ sudo touch /usr/share/applications/webstorm.desktop
 $ sudo vim /usr/share/applications/webstorm.desktop
 ```
@@ -2271,6 +2268,28 @@ Categories=GTK;Utility;TextEditor;Development;
 MimeType=application/javascript;application/json;application/x-httpd-eruby;application/x-httpd-php;application/x-httpd-php3;application/x-httpd-php4;application/x-httpd-php5;application/x-ruby;application/x-bash;application/x-csh;application/x-sh;application/x-zsh;application/x-shellscript;application/x-sql;application/x-tcl;application/xhtml+xml;application/xml;application/xml-dtd;application/xslt+xml;text/coffeescript;text/css;text/html;text/plain;text/xml;text/xml-dtd;text/x-bash;text/x-c++;text/x-c++hdr;text/x-c++src;text/x-c;text/x-chdr;text/x-csh;text/x-csrc;text/x-dsrc;text/x-diff;text/x-go;text/x-java;text/x-java-source;text/x-makefile;text/x-markdown;text/x-objc;text/x-perl;text/x-php;text/x-python;text/x-ruby;text/x-sh;text/x-zsh;text/yaml;inode/directory
 StartupWMClass=webstorm
 ```
+
+
+
+```shell
+$ /opt/webstorm/WebStorm-XXX.YYYYY.ZZZ/bin/webstorm.sh
+```
+
+
+
+```shell
+$ atom ~/.config/git/ignore
+```
+
+Add the following:
+
+```
+**/.idea
+```
+
+
+
+
 
 Import IDE settings from [kde__webstorm-settings.zip](./kde__webstorm-settings.zip)
 
