@@ -2265,12 +2265,13 @@ The best *IDE* for front end development
 
 
 
-Follow the "Installation instructions" on the download page, ref: [link](https://www.jetbrains.com/webstorm/download/#section=linux)
+##### Installation
 
 ```shell
 $ sudo mkdir /opt/webstorm
-$ sudo mv WebStorm-XXX.YYYYY.ZZZ/ /opt/webstorm
-$ sudo ln -s /opt/webstorm/WebStorm-XXX.YYYYY.ZZZ/bin/webstorm /usr/bin
+$ sudo tar xzf ~/Downloads/WebStorm-XXX.Y.Z.tar.gz -C /opt/webstorm/
+$ sudo ln -s /opt/webstorm/WebStorm-XXX.YYYYY.ZZZ/bin/webstorm /usr/bin/
+
 $ sudo touch /usr/share/applications/webstorm.desktop
 $ sudo vim /usr/share/applications/webstorm.desktop
 ```
@@ -2289,7 +2290,79 @@ MimeType=application/javascript;application/json;application/x-httpd-eruby;appli
 StartupWMClass=webstorm
 ```
 
+
+
+```shell
+$ /opt/webstorm/WebStorm-XXX.YYYYY.ZZZ/bin/webstorm.sh
+```
+
+
+
+```shell
+$ atom ~/.config/git/ignore
+```
+
+Add the following:
+
+```
+**/.idea
+```
+
+
+
+
+
 Import IDE settings from [kde__webstorm-settings.zip](./kde__webstorm-settings.zip)
+
+
+
+##### Fix emoji
+
+Fedora packages its default emoji font, **Noto Color Emoji**, using a modern font format called **COLRv1** (contained in `Noto-COLRv1.ttf`). However, the **JetBrains Runtime (JBR)**—the customized Java environment WebStorm runs on—does not yet fully support COLRv1 color fonts.
+
+```shell
+$ wget -O ~/.local/share/fonts/NotoColorEmoji-Legacy.ttf https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf
+
+$ mkdir -p ~/.config/fontconfig/conf.d
+
+$ touch ~/.config/fontconfig/conf.d/10-emoji.conf
+$ atom ~/.config/fontconfig/conf.d/10-emoji.conf
+```
+
+Copy and paste:
+
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+    <!-- Reject/ignore the system COLRv1 font when falling back -->
+    <selectfont>
+        <rejectfont>
+            <glob>/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf</glob>
+        </rejectfont>
+    </selectfont>
+
+    <!-- Use the local CBDT version as the preferred emoji fallback -->
+    <alias>
+        <family>monospace</family>
+        <prefer>
+            <family>Noto Color Emoji</family>
+        </prefer>
+    </alias>
+    <alias>
+        <family>sans-serif</family>
+        <prefer>
+            <family>Noto Color Emoji</family>
+        </prefer>
+    </alias>
+</fontconfig>
+```
+
+Refresh font cache:
+
+```shell
+$ fc-cache -f -v
+```
 
 
 
