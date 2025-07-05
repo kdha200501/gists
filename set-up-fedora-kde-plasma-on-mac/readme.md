@@ -1577,6 +1577,8 @@ For example, switching to Mac OS cursor icons:
 
 - search for "Mac OS by dcppdp"
 
+Under "System Settings" -> "Colors & Themes" -> "Login Screen (SDDM)" -> "Apply Plasma Settings"
+
 
 
 
