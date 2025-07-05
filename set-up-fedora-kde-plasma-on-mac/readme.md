@@ -858,7 +858,6 @@ Under "System Settings" -> "Keyboard" -> "Shortcuts" -> "File"
 
 - change "Move to Trash" to `⌘+delete`
   - this will appear as `Ctrl+Backspace`
-- change "Rename" to `Return`
 
 Under "System Settings" -> "Keyboard" -> "Shortcuts" -> "Navigation"
 
@@ -2069,6 +2068,18 @@ $ wl-paste | git am
 ##### Use triangle in tree view
 
 Copy this patch ([link](patches/kde-dolphin/jacks-customizations__use_triangle_in_tree_view.patch)) and apply
+
+```shell
+$ wl-paste | git am
+```
+
+
+
+
+
+##### interpret the enter QKeyEvent on file as rename signal
+
+Copy this patch ([link](patches/kde-dolphin/jacks-customizations__interpret_the_enter_QKeyEvent_on_file_as_rename_signal.patch)) and apply
 
 ```shell
 $ wl-paste | git am
