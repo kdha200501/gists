@@ -1394,7 +1394,7 @@ Right click on desktop -> "Enter Edit Mode" -> click on the panel
 
   - right click on panel -> "Show Panel Configuration" -> "Add Widgets" -> "Global Menu"
 
-- hide date
+- customize the digital clock widget
 
   ```shell
   $ sudo vim /usr/share/plasma/plasmoids/org.kde.plasma.digitalclock/contents/config/main.xml
@@ -1403,13 +1403,29 @@ Right click on desktop -> "Enter Edit Mode" -> click on the panel
   change to
 
   ```xml
-  <entry name="showDate" type="Bool">
-    <label>Whether the date should be shown next to the clock.</label>
-    <default>false</default>
+  <entry name="firstDayOfWeek" type="Int">
+    <label>Force the calendar to use a specific week day as first day of a week. -1 means follow user locale, 0 is Sunday, 1 is Monday, etc.</label>
+    <default>1</default>
   </entry>
   ```
 
+  ```xml
+  <entry name="dateDisplayFormat" type="Enum">
+    <label>Whether the date should be shown below or beside the time</label>
+    <choices name="Settings::dateDisplayFormat">
+      <choice name="Adaptive" />
+      <choice name="BesideTime" />
+      <choice name="BelowTime" />
+    </choices>
+    <default>1</default>
+  </entry>
+  ```
   
+  configure date format to
+  
+  ```
+  ddd MMMM d
+  ```
 
 
 
