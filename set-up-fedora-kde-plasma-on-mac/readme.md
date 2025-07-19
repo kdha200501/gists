@@ -1191,6 +1191,21 @@ $ wl-paste | git am
 
 
 
+##### Bring back shading
+
+Use the minimize window button as shade CTA
+
+Copy this patch ([link](patches/kde-kwin/jacks-customizations__bring_back_shading.patch
+ )) and apply
+
+```shell
+$ wl-paste | git am
+```
+
+
+
+
+
 ##### Compile and install `kwin`
 
 ```shell
