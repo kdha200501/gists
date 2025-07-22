@@ -50,6 +50,10 @@ $ git config --global core.editor "vim"
 - Enable two finger pinch zoom
   - go to "chrome://flags/#ozone-platform-hint"
   - select "Wayland"
+- Disable echo prevention
+  - go to "chrome://flags/#enable-webrtc-allow-input-volume-adjustment"
+  - select "Disabled"
+
 
 
 
