@@ -1199,12 +1199,30 @@ $ wl-paste | git am
 
 Use the minimize window button as shade CTA
 
-Copy this patch ([link](patches/kde-kwin/jacks-customizations__bring_back_shading.patch
- )) and apply
+Copy this patch ([link](patches/kde-kwin/jacks-customizations__bring_back_shading.patch)) and apply
 
 ```shell
 $ wl-paste | git am
 ```
+
+
+
+
+
+##### Bring back hide
+
+Use hide application shortcut to hide application
+
+Copy this patch ([link](patches/kde-kwin/jacks-customizations__bring_back_hide.patch)) and apply
+
+```shell
+$ wl-paste | git am
+```
+
+> [!IMPORTANT]
+>
+> enable the new shortcut under "System Settings" -> "Keyboard" -> "Shortcuts" -> "Window Management" -> "Minimize Window"
+>
 
 
 
