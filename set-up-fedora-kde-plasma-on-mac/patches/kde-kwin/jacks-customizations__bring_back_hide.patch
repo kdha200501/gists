@@ -1,0 +1,265 @@
+From: Jacks Diao <kdha200501@gmail.com>
+Subject: [PATCH] jacks-customizations: bring back hide
+---
+Index: src/globalshortcuts.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/globalshortcuts.cpp b/src/globalshortcuts.cpp
+--- a/src/globalshortcuts.cpp	(revision f9fae66c0b4be8f6ca8f383fcd823190d7dd0143)
++++ b/src/globalshortcuts.cpp	(revision a7b1ad6bee7bad3985e42d94c2acaf2f3b373a61)
+@@ -17,6 +17,9 @@
+ #include "utils/common.h"
+ // KDE
+ #if KWIN_BUILD_GLOBALSHORTCUTS
++#include "workspace.h"
++#include "window.h"
++#include <NETWM>
+ #include <kglobalaccel_interface.h>
+ #include <kglobalacceld.h>
+ #endif
+@@ -203,6 +206,29 @@
+             return retVal;
+         };
+         if (check(mods, keyQt)) {
++            if (!(mods & Qt::CTRL) || !(mods & Qt::SHIFT) || keyQt != Qt::Key_H) {
++                return true;
++            }
++
++            Window *window = workspace()->activeWindow();
++
++            if(!window) {
++                return true;
++            }
++
++            if (
++                static_cast<NET::WindowType>(window->windowType()) == NET::Desktop ||
++                window->transientFor()
++            ) {
++                return false;
++            }
++
++            if (
++                static_cast<NET::WindowType>(window->windowType()) == NET::Normal &&
++                window->resourceClass().compare("org.kde.dolphin", Qt::CaseInsensitive) == 0
++            ) {
++                return false;
++            }
+             return true;
+         } else if (keyQt == Qt::Key_Backtab) {
+             // KGlobalAccel on X11 has some workaround for Backtab
+Index: src/options.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/options.h b/src/options.h
+--- a/src/options.h	(revision f9fae66c0b4be8f6ca8f383fcd823190d7dd0143)
++++ b/src/options.h	(revision a7b1ad6bee7bad3985e42d94c2acaf2f3b373a61)
+@@ -400,6 +400,7 @@
+         MaximizeOp = 5000,
+         RestoreOp,
+         MinimizeOp,
++        MinimizeOthersOp,
+         MoveOp,
+         UnrestrictedMoveOp,
+         ResizeOp,
+Index: src/plugins/overview/overvieweffect.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/plugins/overview/overvieweffect.cpp b/src/plugins/overview/overvieweffect.cpp
+--- a/src/plugins/overview/overvieweffect.cpp	(revision f9fae66c0b4be8f6ca8f383fcd823190d7dd0143)
++++ b/src/plugins/overview/overvieweffect.cpp	(revision a7b1ad6bee7bad3985e42d94c2acaf2f3b373a61)
+@@ -267,7 +267,7 @@
+
+ bool OverviewEffect::ignoreMinimized() const
+ {
+-    return OverviewConfig::ignoreMinimized();
++    return true;
+ }
+
+ bool OverviewEffect::organizedGrid() const
+Index: src/scripting/workspace_wrapper.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/scripting/workspace_wrapper.cpp b/src/scripting/workspace_wrapper.cpp
+--- a/src/scripting/workspace_wrapper.cpp	(revision f9fae66c0b4be8f6ca8f383fcd823190d7dd0143)
++++ b/src/scripting/workspace_wrapper.cpp	(revision a7b1ad6bee7bad3985e42d94c2acaf2f3b373a61)
+@@ -134,6 +134,7 @@
+ SLOTWRAPPER(slotWindowMaximizeVertical)
+ SLOTWRAPPER(slotWindowMaximizeHorizontal)
+ SLOTWRAPPER(slotWindowMinimize)
++SLOTWRAPPER(slotWindowMinimizeOthers)
+ SLOTWRAPPER(slotWindowShade)
+ SLOTWRAPPER(slotWindowRaise)
+ SLOTWRAPPER(slotWindowLower)
+Index: src/scripting/workspace_wrapper.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/scripting/workspace_wrapper.h b/src/scripting/workspace_wrapper.h
+--- a/src/scripting/workspace_wrapper.h	(revision f9fae66c0b4be8f6ca8f383fcd823190d7dd0143)
++++ b/src/scripting/workspace_wrapper.h	(revision a7b1ad6bee7bad3985e42d94c2acaf2f3b373a61)
+@@ -341,6 +341,7 @@
+     void slotWindowMaximizeVertical();
+     void slotWindowMaximizeHorizontal();
+     void slotWindowMinimize();
++    void slotWindowMinimizeOthers();
+     void slotWindowShade();
+     void slotWindowRaise();
+     void slotWindowLower();
+Index: src/useractions.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/useractions.cpp b/src/useractions.cpp
+--- a/src/useractions.cpp	(revision f9fae66c0b4be8f6ca8f383fcd823190d7dd0143)
++++ b/src/useractions.cpp	(revision a7b1ad6bee7bad3985e42d94c2acaf2f3b373a61)
+@@ -895,7 +895,9 @@
+     initShortcut("Window Maximize Horizontal", i18n("Maximize Window Horizontally"),
+                  0, &Workspace::slotWindowMaximizeHorizontal);
+     initShortcut("Window Minimize", i18n("Minimize Window"),
+-                 Qt::META | Qt::Key_PageDown, &Workspace::slotWindowMinimize);
++                 Qt::CTRL | Qt::Key_H, &Workspace::slotWindowMinimize);
++    initShortcut("Window Minimize Others", "Minimize Other Windows",
++                 Qt::CTRL | Qt::SHIFT | Qt::Key_H, &Workspace::slotWindowMinimizeOthers);
+     initShortcut("Window Shade", i18n("Shade Window"),
+                  Qt::CTRL | Qt::Key_M, &Workspace::slotWindowShade);
+     initShortcut("Window Move", i18n("Move Window"),
+@@ -1174,6 +1176,39 @@
+     case Options::MinimizeOp:
+         window->setMinimized(true);
+         break;
++    case Options::MinimizeOthersOp: {
++        if (
++            static_cast<NET::WindowType>(window->windowType()) == NET::Desktop ||
++            window->transientFor()
++        ) {
++            break;
++        }
++
++        if (
++            static_cast<NET::WindowType>(window->windowType()) == NET::Normal &&
++            window->resourceClass().compare("org.kde.dolphin", Qt::CaseInsensitive) == 0
++        ) {
++            break;
++        }
++
++        QList<Window *> stackingOrder = workspace()->stackingOrder();
++        for (KWin::Window *client : stackingOrder) {
++            if (client == window) {
++                continue;
++            }
++
++            if (Window::belongToSameApplication(client, window, Window::SameApplicationCheck::AllowCrossProcesses)) {
++                continue;
++            }
++
++            if (client->windowType() != WindowType::Normal) {
++                continue;
++            }
++
++            client->setMinimized(true);
++        }
++        break;
++    }
+     case Options::ShadeOp:
+         // leach off the maximization mechanism to perform shading when the "Ctrl + M" combo is pressed
+         window->maximize(window->maximizeMode() == MaximizeShade
+@@ -1370,6 +1405,13 @@
+     }
+ }
+
++void Workspace::slotWindowMinimizeOthers()
++{
++    if (USABLE_ACTIVE_WINDOW) {
++        performWindowOperation(m_activeWindow, Options::MinimizeOthersOp);
++    }
++}
++
+ /**
+  * Shades/unshades the active window respectively.
+  */
+Index: src/workspace.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/workspace.h b/src/workspace.h
+--- a/src/workspace.h	(revision f9fae66c0b4be8f6ca8f383fcd823190d7dd0143)
++++ b/src/workspace.h	(revision a7b1ad6bee7bad3985e42d94c2acaf2f3b373a61)
+@@ -505,6 +505,7 @@
+     void slotWindowMaximizeVertical();
+     void slotWindowMaximizeHorizontal();
+     void slotWindowMinimize();
++    void slotWindowMinimizeOthers();
+     void slotWindowShade();
+     void slotWindowRaise();
+     void slotWindowLower();
+Index: src/x11window.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/x11window.cpp b/src/x11window.cpp
+--- a/src/x11window.cpp	(revision f9fae66c0b4be8f6ca8f383fcd823190d7dd0143)
++++ b/src/x11window.cpp	(revision a7b1ad6bee7bad3985e42d94c2acaf2f3b373a61)
+@@ -1311,7 +1311,20 @@
+     }
+     updateVisibility();
+     updateAllowedActions();
+-    workspace()->updateMinimizedOfTransients(this);
++
++    QList<Window *> stackingOrder = workspace()->stackingOrder();
++    for (KWin::Window *client : stackingOrder) {
++        if (client == this) {
++            workspace()->updateMinimizedOfTransients(client);
++            continue;
++        }
++
++        if (!Window::belongToSameApplication(client, this, Window::SameApplicationCheck::AllowCrossProcesses)) {
++            continue;
++        }
++
++        client->setMinimized(isMinimized());
++    }
+ }
+
+ bool X11Window::isShadeable() const
+Index: src/xdgshellwindow.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/xdgshellwindow.cpp b/src/xdgshellwindow.cpp
+--- a/src/xdgshellwindow.cpp	(revision f9fae66c0b4be8f6ca8f383fcd823190d7dd0143)
++++ b/src/xdgshellwindow.cpp	(revision a7b1ad6bee7bad3985e42d94c2acaf2f3b373a61)
+@@ -808,7 +808,20 @@
+             workspace()->activateNextWindow(this);
+         }
+     }
+-    workspace()->updateMinimizedOfTransients(this);
++
++    QList<Window *> stackingOrder = workspace()->stackingOrder();
++    for (KWin::Window *client : stackingOrder) {
++        if (client == this) {
++            workspace()->updateMinimizedOfTransients(client);
++            continue;
++        }
++
++        if (!Window::belongToSameApplication(client, this, Window::SameApplicationCheck::AllowCrossProcesses)) {
++            continue;
++        }
++
++        client->setMinimized(isMinimized());
++    }
+ }
+
+ void XdgToplevelWindow::doSetActive()
