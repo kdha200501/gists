@@ -1,0 +1,203 @@
+From: Jacks Diao <kdha200501@gmail.com>
+Subject: [PATCH] jacks-customizations: bring back hide
+---
+Index: src/options.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/options.h b/src/options.h
+--- a/src/options.h	(revision 467bd2c1d82f46d0b2629411ef9dbec1f7d01f57)
++++ b/src/options.h	(revision 30b925124fa20497c4cf2b30fa978cd3fa89c60f)
+@@ -400,6 +400,7 @@
+         MaximizeOp = 5000,
+         RestoreOp,
+         MinimizeOp,
++        MinimizeOthersOp,
+         MoveOp,
+         UnrestrictedMoveOp,
+         ResizeOp,
+Index: src/plugins/overview/overvieweffect.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/plugins/overview/overvieweffect.cpp b/src/plugins/overview/overvieweffect.cpp
+--- a/src/plugins/overview/overvieweffect.cpp	(revision 467bd2c1d82f46d0b2629411ef9dbec1f7d01f57)
++++ b/src/plugins/overview/overvieweffect.cpp	(revision 30b925124fa20497c4cf2b30fa978cd3fa89c60f)
+@@ -267,7 +267,7 @@
+
+ bool OverviewEffect::ignoreMinimized() const
+ {
+-    return OverviewConfig::ignoreMinimized();
++    return true;
+ }
+
+ bool OverviewEffect::organizedGrid() const
+Index: src/scripting/workspace_wrapper.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/scripting/workspace_wrapper.cpp b/src/scripting/workspace_wrapper.cpp
+--- a/src/scripting/workspace_wrapper.cpp	(revision 467bd2c1d82f46d0b2629411ef9dbec1f7d01f57)
++++ b/src/scripting/workspace_wrapper.cpp	(revision 30b925124fa20497c4cf2b30fa978cd3fa89c60f)
+@@ -134,6 +134,7 @@
+ SLOTWRAPPER(slotWindowMaximizeVertical)
+ SLOTWRAPPER(slotWindowMaximizeHorizontal)
+ SLOTWRAPPER(slotWindowMinimize)
++SLOTWRAPPER(slotWindowMinimizeOthers)
+ SLOTWRAPPER(slotWindowShade)
+ SLOTWRAPPER(slotWindowRaise)
+ SLOTWRAPPER(slotWindowLower)
+Index: src/scripting/workspace_wrapper.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/scripting/workspace_wrapper.h b/src/scripting/workspace_wrapper.h
+--- a/src/scripting/workspace_wrapper.h	(revision 467bd2c1d82f46d0b2629411ef9dbec1f7d01f57)
++++ b/src/scripting/workspace_wrapper.h	(revision 30b925124fa20497c4cf2b30fa978cd3fa89c60f)
+@@ -341,6 +341,7 @@
+     void slotWindowMaximizeVertical();
+     void slotWindowMaximizeHorizontal();
+     void slotWindowMinimize();
++    void slotWindowMinimizeOthers();
+     void slotWindowShade();
+     void slotWindowRaise();
+     void slotWindowLower();
+Index: src/useractions.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/useractions.cpp b/src/useractions.cpp
+--- a/src/useractions.cpp	(revision 467bd2c1d82f46d0b2629411ef9dbec1f7d01f57)
++++ b/src/useractions.cpp	(revision 30b925124fa20497c4cf2b30fa978cd3fa89c60f)
+@@ -895,7 +895,9 @@
+     initShortcut("Window Maximize Horizontal", i18n("Maximize Window Horizontally"),
+                  0, &Workspace::slotWindowMaximizeHorizontal);
+     initShortcut("Window Minimize", i18n("Minimize Window"),
+-                 Qt::META | Qt::Key_PageDown, &Workspace::slotWindowMinimize);
++                 Qt::CTRL | Qt::Key_H, &Workspace::slotWindowMinimize);
++    initShortcut("Window Minimize Others", "Minimize Other Windows",
++                 Qt::CTRL | Qt::SHIFT | Qt::Key_H, &Workspace::slotWindowMinimizeOthers);
+     initShortcut("Window Shade", i18n("Shade Window"),
+                  Qt::CTRL | Qt::Key_M, &Workspace::slotWindowShade);
+     initShortcut("Window Move", i18n("Move Window"),
+@@ -1174,6 +1176,25 @@
+     case Options::MinimizeOp:
+         window->setMinimized(true);
+         break;
++    case Options::MinimizeOthersOp: {
++        QList<Window *> stackingOrder = workspace()->stackingOrder();
++        for (KWin::Window *client : stackingOrder) {
++            if (client == window) {
++                continue;
++            }
++
++            if (Window::belongToSameApplication(client, window, Window::SameApplicationCheck::AllowCrossProcesses)) {
++                continue;
++            }
++
++            if (client->windowType() != WindowType::Normal) {
++                continue;
++            }
++
++            client->setMinimized(true);
++        }
++        break;
++    }
+     case Options::ShadeOp:
+         window->maximize(window->maximizeMode() == MaximizeShade
+                                      ? MaximizeRestore
+@@ -1369,6 +1390,13 @@
+     }
+ }
+
++void Workspace::slotWindowMinimizeOthers()
++{
++    if (USABLE_ACTIVE_WINDOW) {
++        performWindowOperation(m_activeWindow, Options::MinimizeOthersOp);
++    }
++}
++
+ /**
+  * Shades/unshades the active window respectively.
+  */
+Index: src/workspace.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/workspace.h b/src/workspace.h
+--- a/src/workspace.h	(revision 467bd2c1d82f46d0b2629411ef9dbec1f7d01f57)
++++ b/src/workspace.h	(revision 30b925124fa20497c4cf2b30fa978cd3fa89c60f)
+@@ -505,6 +505,7 @@
+     void slotWindowMaximizeVertical();
+     void slotWindowMaximizeHorizontal();
+     void slotWindowMinimize();
++    void slotWindowMinimizeOthers();
+     void slotWindowShade();
+     void slotWindowRaise();
+     void slotWindowLower();
+Index: src/x11window.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/x11window.cpp b/src/x11window.cpp
+--- a/src/x11window.cpp	(revision 467bd2c1d82f46d0b2629411ef9dbec1f7d01f57)
++++ b/src/x11window.cpp	(revision 30b925124fa20497c4cf2b30fa978cd3fa89c60f)
+@@ -1311,7 +1311,20 @@
+     }
+     updateVisibility();
+     updateAllowedActions();
+-    workspace()->updateMinimizedOfTransients(this);
++
++    QList<Window *> stackingOrder = workspace()->stackingOrder();
++    for (KWin::Window *client : stackingOrder) {
++        if (client == this) {
++            workspace()->updateMinimizedOfTransients(client);
++            continue;
++        }
++
++        if (!Window::belongToSameApplication(client, this, Window::SameApplicationCheck::AllowCrossProcesses)) {
++            continue;
++        }
++
++        client->setMinimized(isMinimized());
++    }
+ }
+
+ bool X11Window::isShadeable() const
+Index: src/xdgshellwindow.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/xdgshellwindow.cpp b/src/xdgshellwindow.cpp
+--- a/src/xdgshellwindow.cpp	(revision 467bd2c1d82f46d0b2629411ef9dbec1f7d01f57)
++++ b/src/xdgshellwindow.cpp	(revision 30b925124fa20497c4cf2b30fa978cd3fa89c60f)
+@@ -808,7 +808,20 @@
+             workspace()->activateNextWindow(this);
+         }
+     }
+-    workspace()->updateMinimizedOfTransients(this);
++
++    QList<Window *> stackingOrder = workspace()->stackingOrder();
++    for (KWin::Window *client : stackingOrder) {
++        if (client == this) {
++            workspace()->updateMinimizedOfTransients(client);
++            continue;
++        }
++
++        if (!Window::belongToSameApplication(client, this, Window::SameApplicationCheck::AllowCrossProcesses)) {
++            continue;
++        }
++
++        client->setMinimized(isMinimized());
++    }
+ }
+
+ void XdgToplevelWindow::doSetActive()
