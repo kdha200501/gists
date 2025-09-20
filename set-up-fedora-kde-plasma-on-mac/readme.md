@@ -2749,12 +2749,67 @@ $ newgrp docker
 ```shell
 $ sudo dnf install nginx
 
+# ensure a daemon is available at
+$ cat /usr/lib/systemd/system/nginx.service
+```
+
+> [!TIP]
+>
+> It should look like
+>
+> ```shell
+> [Unit]
+> Description=The nginx HTTP and reverse proxy server
+> After=network-online.target remote-fs.target nss-lookup.target
+> Wants=network-online.target
+> 
+> [Service]
+> Type=forking
+> PIDFile=/run/nginx.pid
+> # Nginx will fail to start if /run/nginx.pid already exists but has the wrong
+> # SELinux context. This might happen when running `nginx -t` from the cmdline.
+> # https://bugzilla.redhat.com/show_bug.cgi?id=1268621
+> ExecStartPre=/usr/bin/rm -f /run/nginx.pid
+> ExecStartPre=/usr/sbin/nginx -t
+> ExecStart=/usr/sbin/nginx
+> ExecReload=/usr/sbin/nginx -s reload
+> KillSignal=SIGQUIT
+> TimeoutStopSec=5
+> KillMode=mixed
+> PrivateTmp=true
+> 
+> [Install]
+> WantedBy=multi-user.target
+> 
+> ```
+
+
+
+Create a LinuxSE policy for the daemon
+
+```shell
+$ sudo dnf install policycoreutils policycoreutils-python-utils selinux-policy-devel
+
+$ cd ~
+$ sudo systemctl enable nginx.service 
+$ sudo systemctl start nginx.service 
+$ sudo ausearch -c 'nginx' --raw | audit2allow -M nginx_local
+$ sudo semodule -i nginx_local.pp 
+$ sudo systemctl restart nginx
+```
+
+
+
+Configure
+
+```shell
 $ sudo mkdir -p /etc/nginx/ssl/reverse-proxy
 $ cd /etc/nginx/ssl/reverse-proxy
 $ sudo openssl req -x509 -nodes -days 14608 -newkey rsa:2048 -keyout nginx.key -out nginx.crt
-
 $ sudo vim /etc/nginx/nginx.conf
 ```
+
+
 
 Change to
 
@@ -2822,6 +2877,11 @@ location / {
     proxy_redirect off;
 }
 ```
+
+> [!TIP]
+>
+> Restart `nginx` to load the new configurations
+>
 
 
 
