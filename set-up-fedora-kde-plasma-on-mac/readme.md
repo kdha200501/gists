@@ -133,6 +133,43 @@ X-KDE-SubstituteUID=false
 
 
 
+# Create launchers
+
+##### *System Monitor*
+
+```shell
+$ touch ~/.local/share/applications/activity-monitor.desktop
+$ vim ~/.local/share/applications/activity-monitor.desktop
+```
+
+Copy and paste:
+
+```shell
+[Desktop Entry]
+Name=Activity Monitor
+Exec=plasma-systemmonitor
+Icon=utilities-system-monitor
+Type=Application
+Categories=System;
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Install `vim`
 
 `vi` does not support syntax highlighting, so....
