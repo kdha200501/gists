@@ -151,7 +151,30 @@ Exec=plasma-systemmonitor
 Icon=utilities-system-monitor
 Type=Application
 Categories=System;
+```
 
+
+
+##### *Terminal*
+
+```shell
+$ touch ~/.local/share/applications/terminal.desktop
+$ vim ~/.local/share/applications/terminal.desktop
+```
+
+Copy and paste:
+
+```shell
+[Desktop Entry]
+Type=Application
+Exec=konsole
+Icon=/home/jacks/Pictures/icons/terminal.png
+Categories=Qt;KDE;System;TerminalEmulator;
+StartupNotify=true
+X-KDE-AuthorizeAction=shell_access
+StartupWMClass=konsole
+Name=Terminal
+Comment=Command line access
 ```
 
 
@@ -1112,19 +1135,14 @@ alias atom=pulsar
 
 
 ```shell
-$ touch ~/.local/share/applications/pulsar.desktop
-$ vim ~/.local/share/applications/pulsar.desktop
+$ sudo vim /usr/share/applications/pulsar.desktop 
 ```
 
-Copy and paste:
+Change these fields:
 
 ```shell
-[Desktop Entry]
 Name=Atom
-Exec=pulsar %F
-Icon=pulsar
-Type=Application
-Categories=Development;
+Icon=/path/to/atom.png
 ```
 
 
