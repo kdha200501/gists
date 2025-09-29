@@ -914,6 +914,14 @@ Go to "Window Management" -> "Task Switcher" -> "Main"
 
 
 
+##### Do not hide other windows when tabbing through windows
+
+Launch "System Settings"
+
+Go to "Window Management" -> "Task Switcher" -> "Main"
+
+- disable "Show selected window"
+
 
 
 ##### More on remap shortcuts
