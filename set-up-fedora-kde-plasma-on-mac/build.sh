@@ -27,7 +27,7 @@ fi
 [ -f "$CWD/dist.tar" ] && rm "$CWD/dist.tar"
 
 # List of projects to build
-projects=(libinput kio dolphin aurorae kwin plasma-desktop)
+projects=(libinput kio dolphin aurorae kscreenlocker kwin plasma-workspace plasma-desktop)
 
 for project in "${projects[@]}"; do
   header="= $project ="
@@ -67,15 +67,20 @@ for project in "${projects[@]}"; do
 
   # Build project from source, install build artifacts into dist folder
   case "$project" in
-    aurorae|dolphin|kio|kwin|plasma-desktop)
-      cmake -DCMAKE_INSTALL_PREFIX="/usr" -B "$CWD/$project/build/" -S "$CWD/$project/" 2>>"$CWD/build.$project.log" || continue
-      make -C "$CWD/$project/build/" -j"$(nproc)" 2>>"$CWD/build.$project.log" || continue
-      sudo make -C "$CWD/$project/build/" install DESTDIR="$CWD/dist/" 2>>"$CWD/build.$project.log" || continue
+    aurorae|dolphin|kio|kwin|plasma-workspace|plasma-desktop)
+      cmake -DCMAKE_INSTALL_PREFIX="/usr" -DBUILD_TESTING=OFF -B "$CWD/$project/build/" -S "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || continue
+      make -C "$CWD/$project/build/" -j"$(nproc)" >>"$CWD/build.$project.log" 2>&1 || continue
+      sudo make -C "$CWD/$project/build/" install DESTDIR="$CWD/dist/" >>"$CWD/build.$project.log" 2>&1 || continue
+      ;;
+    kscreenlocker)
+      cmake -DCMAKE_INSTALL_PREFIX="/usr" -DBUILD_TESTING=OFF -DKDE_INSTALL_LIBEXECDIR=libexec -B "$CWD/$project/build/" -S "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || continue
+      make -C "$CWD/$project/build/" -j"$(nproc)" >>"$CWD/build.$project.log" 2>&1 || continue
+      sudo make -C "$CWD/$project/build/" install DESTDIR="$CWD/dist/" >>"$CWD/build.$project.log" 2>&1 || continue
       ;;
     libinput)
-      meson setup --prefix="/usr" -Dversion="$branch" "$CWD/$project/build/" "$CWD/$project/" 2>>"$CWD/build.$project.log" || continue
-      ninja -C "$CWD/$project/build/" -j"$(nproc)" 2>>"$CWD/build.$project.log" || continue
-      sudo env DESTDIR="$CWD/dist/" ninja -C "$CWD/$project/build/" install 2>>"$CWD/build.$project.log" || continue
+      meson setup --prefix="/usr" -Dversion="$branch" "$CWD/$project/build/" "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || continue
+      ninja -C "$CWD/$project/build/" -j"$(nproc)" >>"$CWD/build.$project.log" 2>&1 || continue
+      sudo env DESTDIR="$CWD/dist/" ninja -C "$CWD/$project/build/" install >>"$CWD/build.$project.log" 2>&1 || continue
       ;;
     *)
       echo "No build instructions for $project. Skipping."
