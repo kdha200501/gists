@@ -1294,43 +1294,9 @@ Right click on desktop -> "Enter Edit Mode" -> click on the panel
 - display the current application's icon at top-left corner
   - right click on panel -> "Show Panel Configuration" -> "Add Widgets" -> "Get New Widgets" -> "Download New Plasma Widgets"
     - search for "Window Title Applet 6 by dhruv8sh"
-
 - display the current application's menu in the panel
 
   - right click on panel -> "Show Panel Configuration" -> "Add Widgets" -> "Global Menu"
-
-- customize the digital clock widget
-
-  ```shell
-  $ sudo vim /usr/share/plasma/plasmoids/org.kde.plasma.digitalclock/contents/config/main.xml
-  ```
-
-  change to
-
-  ```xml
-  <entry name="firstDayOfWeek" type="Int">
-    <label>Force the calendar to use a specific week day as first day of a week. -1 means follow user locale, 0 is Sunday, 1 is Monday, etc.</label>
-    <default>1</default>
-  </entry>
-  ```
-
-  ```xml
-  <entry name="dateDisplayFormat" type="Enum">
-    <label>Whether the date should be shown below or beside the time</label>
-    <choices name="Settings::dateDisplayFormat">
-      <choice name="Adaptive" />
-      <choice name="BesideTime" />
-      <choice name="BelowTime" />
-    </choices>
-    <default>1</default>
-  </entry>
-  ```
-  
-  configure date format to
-  
-  ```
-  ddd MMMM d
-  ```
 
 
 
@@ -1772,7 +1738,11 @@ https://github.com/kdha200501/dolphin
 
 https://github.com/kdha200501/aurorae
 
+https://github.com/kdha200501/kscreenlocker
+
 https://github.com/kdha200501/kwin
+
+https://github.com/kdha200501/plasma-workspace
 
 https://github.com/kdha200501/plasma-desktop
 
