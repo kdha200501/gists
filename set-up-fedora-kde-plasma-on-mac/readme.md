@@ -1746,6 +1746,8 @@ https://github.com/kdha200501/plasma-workspace
 
 https://github.com/kdha200501/plasma-desktop
 
+https://github.com/kdha200501/sddm
+
 
 
 Download and run the [build script](build.sh) to generate an installer
