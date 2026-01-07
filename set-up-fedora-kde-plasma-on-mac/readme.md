@@ -1544,6 +1544,78 @@ For example, installing a BeOS decoration
 
 
 
+# Customize terminal
+
+##### Add a `MOTD`
+
+```shell
+$ sudo touch /etc/profile.d/motd.sh
+$ sudo vim /etc/profile.d/motd.sh
+```
+
+Copy and paste:
+
+```shell
+#!/bin/bash
+
+BOLD=$(tput bold)
+NORMAL=$(tput sgr0)
+
+# We use paste with a tab delimiter: -d $'\t'
+paste -d $'\t' <(cat << 'EOF'
+
+        (/
+   .---__--.
+  /         \
+ |         /
+ |         \_
+  \         /
+   `._.-._.'
+
+EOF
+) <(cat << EOF
+
+
+${BOLD}${USER}@${HOSTNAME}${NORMAL}
+${BOLD}OS:${NORMAL}       A/UX 3.1.1
+${BOLD}KERNEL:${NORMAL}   $(uname -r)
+${BOLD}UPTIME:${NORMAL}   $(uptime -p | sed 's/up //')
+${BOLD}SHELL:${NORMAL}    $SHELL
+EOF
+)
+
+```
+
+
+
+##### Change font
+
+```shell
+$ cd ~/..local/share/fonts
+$ git clone https://github.com/cseelus/monego.git
+
+$ fc-cache -f -v
+$ fc-list : family | grep -i monego
+```
+
+Update terminal profile to use the `Monego` font
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Convert the installed decoration into Mac OS 9
 
 Using assets generously provided by Michael Feeney (ref: [link](https://www.figma.com/community/file/966779730364082883/mac-os-9-ui-kit)), we apply the Mac OS 9 platinum design on top of the BeOS window decoration
