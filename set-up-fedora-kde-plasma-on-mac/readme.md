@@ -45,7 +45,16 @@ $ git config --global core.editor "vim"
 
 # Install Chrome
 
-- Download and install the `.rpm` version of Google Chrome, ref: [link](https://www.google.com/chrome/)
+- Download and install the `.rpm` version of Google Chrome, ref: [link1](https://www.google.com/chrome/) [link2](https://www.google.com/intl/en_ca/chrome/canary/)
+
+> [!TIP]
+>
+> Use `dnf` to update Chrome
+>
+> ```shell
+> $ sudo dnf upgrade google-chrome
+> $ sudo dnf upgrade google-chrome-canary
+> ```
 
 - Enable two finger pinch zoom
   - go to "chrome://flags/#ozone-platform-hint"
