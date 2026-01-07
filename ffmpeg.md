@@ -21,12 +21,6 @@
 ```shell
 #!/bin/bash
 
-# Check if an argument was provided
-if [ $# -lt 1 ]; then
-    echo "Usage: $0 <input_file>"
-    exit 1
-fi
-
 TRACKS_JSON=<path to tracks.json>
 
 # Check if the file exists
@@ -44,7 +38,7 @@ jq -c '.[]' "$TRACKS_JSON" | while read -r track; do
     artist=$(echo "$track" | jq -r '.artists')
     name=$(echo "$track" | jq -r '.name')
     
-    if [ -z "$discNumber" ] || [ -z "$trackNumber" ] || [ -z "$artist" ] || [ -z "$name" ] || [ -z "$trackFilePath" ] || [ -z "$albumArtFilePath" ]; then
+    if [ [ -z "$trackNumber" ] || [ -z "$artist" ] || [ -z "$name" ] || [ -z "$trackFilePath" ] || [ -z "$albumArtFilePath" ]; then
         echo "✗ ERROR: Missing required fields for track processing"
         continue
     fi
