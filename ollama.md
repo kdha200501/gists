@@ -40,7 +40,7 @@ Codename:       noble
 
 ```shell
 $ df -h
-$ sudo vgdisplayc
+$ sudo vgdisplay
 ```
 
 > [!WARNING]
@@ -81,7 +81,7 @@ $ sudo reboot
 
 
 
-# Install `Docker`
+# Install Docker
 
 ```shell
 $ sudo apt install apt-transport-https ca-certificates curl software-properties-common
@@ -101,12 +101,29 @@ $ newgrp docker
 
 
 
-# Run `ollama` server from docker compose
+# Run Ollama server from docker compose
+
+##### Pull Ollama docker image specifically for `rocm`
 
 ```shell
-$ docker pull "ollama/ollama:rocm"
+$ nohup docker pull ollama/ollama:rocm > $HOME/pull_ollama_log.txt 2>&1 &
+```
 
+
+
+##### Pull docker image for an Ollama Webapp
+
+```shell
+$ nohup docker pull ghcr.io/open-webui/open-webui:main > $HOME/pull_open_webui_log.txt 2>&1 &
+```
+
+
+
+##### Create docker compose
+
+```shell
 $ sudo mkdir -p /opt/ollama/llm-cache
+$ sudo mkdir -p /opt/ollama/open-webui
 
 $ sudo mkdir -p /opt/ollama/docker
 $ sudo touch /opt/ollama/docker/docker-compose.yml
@@ -116,6 +133,10 @@ $ sudo vim /opt/ollama/docker/docker-compose.yml
 Copy and paste:
 
 ```yaml
+networks:
+  ollama_network:
+    driver: bridge
+
 services:
   ollama:
     image: ollama/ollama:rocm
@@ -128,7 +149,25 @@ services:
       - "${ROCM_RENDER_NODE}"
     volumes:
       - /opt/ollama/llm-cache:/root/.ollama
+    networks:
+      - ollama_network
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - OLLAMA_KEEP_ALIVE=14400
     command: serve
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    environment:
+      - "OLLAMA_BASE_URL=http://ollama-rocm:11434"
+    volumes:
+      - /opt/ollama/open-webui:/app/backend/data
+    networks:
+      - ollama_network
 ```
 
 
@@ -151,7 +190,7 @@ Example output:
 
 
 
-##### Address environment variables
+##### Address dynamic environment variables
 
 ```shell
 $ sudo touch /opt/ollama/docker/env.sh
@@ -174,8 +213,6 @@ done | head -n1)
 
 cat > /opt/ollama/docker/.env <<EOF
 ROCM_RENDER_NODE=$ROCM_RENDER_NODE
-CUDA_VISIBLE_DEVICES=0
-OLLAMA_KEEP_ALIVE=14400
 EOF
 ```
 
@@ -185,7 +222,7 @@ EOF
 
 
 
-##### Create a service for the `ollama` server
+##### Create a service for the Ollama server
 
 ```shell
 $ sudo touch /etc/systemd/system/ollama.service
@@ -220,11 +257,11 @@ $ docker ps
 
 
 
-##### Pull a LLM
+##### Pull LLMs
 
 ```shell
-$ docker exec ollama-rocm nohup ollama pull qwen3-coder:30b > $HOME/ollama_pull.log 2>&1 & disown
-$ tail -f $HOME/ollama_pull.log
+$ nohup docker exec ollama-rocm ollama pull qwen3-coder:30b > $HOME/qwen_pull.log 2>&1 &
+$ nohup docker exec ollama-rocm ollama pull gemma3:27b > $HOME/gemma_pull.log 2>&1 &
 ```
 
 > [!TIP]
@@ -232,6 +269,8 @@ $ tail -f $HOME/ollama_pull.log
 > The `qwen2.5-coder` variants are incompatible with `read_file` tool calling
 >
 > The `qwen3-coder` variants are compatible with `read_file` tool calling
+>
+> The `gemma3` LLM is multi modal
 >
 > See available models at https://ollama.com/library
 
