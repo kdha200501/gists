@@ -73,70 +73,109 @@ for project in "${projects[@]}"; do
   # Clean up previous logs
   [ -f "$CWD/build.$project.log" ] && rm "$CWD/build.$project.log"
 
-  if [[ ! -d "$CWD/$project" ]]; then
-    echo "❌ Project directory not found: $CWD/$project"
+  (
+    if [[ ! -d "$CWD/$project" ]]; then
+      echo "❌ Project directory not found: $CWD/$project"
+      exit 1
+    fi
+
+    # Fetch notes and branches
+    git -C "$CWD/$project" fetch origin refs/notes/commits:refs/notes/commits >>"$CWD/build.$project.log" 2>&1
+    git -C "$CWD/$project" fetch --prune >>"$CWD/build.$project.log" 2>&1
+
+    # Determine branch from notes
+    root_commit=$(git -C "$CWD/$project" rev-list --max-parents=0 origin/master 2>>"$CWD/build.$project.log")
+    if [ -z "$root_commit" ]; then
+      echo "❌ Skipping $project: could not find root commit."
+      exit 1
+    fi
+
+    branch=$(git -C "$CWD/$project" notes show "$root_commit" 2>>"$CWD/build.$project.log")
+    if [ -z "$branch" ]; then
+      echo "❌ Skipping $project: no branch info in notes."
+      exit 1
+    fi
+
+    # Checkout branch
+    git -C "$CWD/$project" checkout "$branch" >>"$CWD/build.$project.log" 2>&1 || {
+      echo "❌ Skipping $project: failed to checkout branch '$branch'."
+      exit 1
+    }
+
+    git -C "$CWD/$project" reset --hard "origin/$branch" >>"$CWD/build.$project.log" 2>&1
+
+    # Build project from source, install build artifacts into dist folder
+    case "$project" in
+      aurorae|dolphin|kio|kwin|plasma-workspace|plasma-desktop)
+        cmake -DCMAKE_INSTALL_PREFIX="/usr" -DBUILD_TESTING=OFF -B "$CWD/$project/build/" -S "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || {
+          echo "❌ cmake error, see log at $CWD/build.$project.log"
+          exit 1
+        }
+        build_and_install_with_make "$project" || {
+          echo "❌ make error, see log at $CWD/build.$project.log"
+          exit 1
+        }
+        ;;
+      kscreenlocker)
+        cmake -DCMAKE_INSTALL_PREFIX="/usr" -DBUILD_TESTING=OFF -DKDE_INSTALL_LIBEXECDIR=libexec -B "$CWD/$project/build/" -S "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || {
+          echo "❌ cmake error, see log at $CWD/build.$project.log"
+          exit 1
+        }
+        build_and_install_with_make "$project" || {
+          echo "❌ make error, see log at $CWD/build.$project.log"
+          exit 1
+        }
+        ;;
+      libinput)
+        meson setup --prefix="/usr" -Dversion="$branch" "$CWD/$project/build/" "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || {
+          echo "❌ meson error, see log at $CWD/build.$project.log"
+          exit 1
+        }
+        build_and_install_with_ninja "$project" || {
+          echo "❌ ninja error, see log at $CWD/build.$project.log"
+          exit 1
+        }
+        ;;
+      sddm)
+        if [[ ! -f "$CWD/$project/sddm.spec" ]]; then
+          echo "❌ Spec file not found: $CWD/$project/sddm.spec"
+          exit 1
+        fi
+
+        build_and_bundle_with_rpm "$project" "sddm.spec" || exit 1
+        ;;
+      *)
+        echo "❌ No build instructions for $project. Skipping."
+        ;;
+    esac
+  ) &
+
+  JOB_PID=$!
+
+  tail -f --pid=$JOB_PID -n 1 "$CWD/build.$project.log" 2>/dev/null | while read -r line; do
+    printf "\r\e[K🚀 %s" "${line:0:(($COLUMNS - 3))}"
+  done
+
+  wait $JOB_PID
+
+  if [ $? -ne 0 ]; then
+    printf "\r\e[K%s\n" "❌ build log: $CWD/build.$project.log"
     continue
   fi
 
-  # Fetch notes and branches
-  git -C "$CWD/$project" fetch origin refs/notes/commits:refs/notes/commits >>"$CWD/build.$project.log" 2>&1
-  git -C "$CWD/$project" fetch --prune >>"$CWD/build.$project.log" 2>&1
-
-  # Determine branch from notes
-  root_commit=$(git -C "$CWD/$project" rev-list --max-parents=0 origin/master 2>>"$CWD/build.$project.log")
-  if [ -z "$root_commit" ]; then
-    echo "❌ Skipping $project: could not find root commit."
-    continue
-  fi
-
-  branch=$(git -C "$CWD/$project" notes show "$root_commit" 2>>"$CWD/build.$project.log")
-  if [ -z "$branch" ]; then
-    echo "❌ Skipping $project: no branch info in notes."
-    continue
-  fi
-
-  # Checkout branch
-  git -C "$CWD/$project" checkout "$branch" >>"$CWD/build.$project.log" 2>&1 || {
-    echo "❌ Skipping $project: failed to checkout branch '$branch'."
-    continue
-  }
-
-  git -C "$CWD/$project" reset --hard "origin/$branch" >>"$CWD/build.$project.log" 2>&1
-
-  # Build project from source, install build artifacts into dist folder
-  case "$project" in
-    aurorae|dolphin|kio|kwin|plasma-workspace|plasma-desktop)
-      cmake -DCMAKE_INSTALL_PREFIX="/usr" -DBUILD_TESTING=OFF -B "$CWD/$project/build/" -S "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || continue
-      build_and_install_with_make "$project" || continue
-      ;;
-    kscreenlocker)
-      cmake -DCMAKE_INSTALL_PREFIX="/usr" -DBUILD_TESTING=OFF -DKDE_INSTALL_LIBEXECDIR=libexec -B "$CWD/$project/build/" -S "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || continue
-      build_and_install_with_make "$project" || continue
-      ;;
-    libinput)
-      meson setup --prefix="/usr" -Dversion="$branch" "$CWD/$project/build/" "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || continue
-      build_and_install_with_ninja "$project" || continue
-      ;;
-    sddm)
-      if [[ ! -f "$CWD/$project/sddm.spec" ]]; then
-        echo "❌ Spec file not found: $CWD/$project/sddm.spec"
-        continue
-      fi
-
-      build_and_bundle_with_rpm "$project" "sddm.spec" || continue
-      ;;
-    *)
-      echo "❌ No build instructions for $project. Skipping."
-      ;;
-  esac
-
-  echo "✅ build log: $CWD/build.$project.log"
+  printf "\r\e[K%s\n" "✅ build log: $CWD/build.$project.log"
 done
 
 # Bundle up the dist directory into a tarball
 if [[ -d "$CWD/dist/" ]]; then
-  echo "Bundling up installation files into $CWD/dist.tar.gz"
-  tar czf "$CWD/dist.tar.gz" -C "$CWD/dist/" .
+  echo "Bundling up installation files"
+  tar -cvzf "$CWD/dist.tar.gz" -C "$CWD/dist/" . 2>&1 | while read -r line; do
+    printf "\r\e[K📦 %s" "${line:0:(($COLUMNS - 3))}"
+  done
+
+  TAR_EXIT_STATUS=${PIPESTATUS[0]}
+
+  [[ $TAR_EXIT_STATUS -eq 0 ]] && printf "\r\e[K💾 $CWD/dist.tar.gz\n" || printf "\r\e[K❌ (Exit code: $TAR_EXIT_STATUS)\n"
 else
   echo "❌ dist folder not found: $CWD/dist/"
 fi
@@ -145,8 +184,12 @@ fi
 sddm_project="$CWD/sddm"
 sddm_x86_64_rpm="$(find "$sddm_project" -type f -name '*x86_64.rpm' | head -n 1)"
 if [[ -n "$sddm_x86_64_rpm" && -f "$sddm_x86_64_rpm" ]]; then
-  echo "Moving $sddm_x86_64_rpm to $CWD"
+  echo "Moving $sddm_x86_64_rpm"
   mv "$sddm_x86_64_rpm" "$sddm_project".rpm
+
+  MV_EXIT_STATUS=$?
+
+  [[ $MV_EXIT_STATUS -eq 0 ]] && echo "💾 $sddm_project.rpm" || echo "❌ (Exit code: $MV_EXIT_STATUS)"
 else
   echo "❌ RPM not found under $sddm_project"
 fi
