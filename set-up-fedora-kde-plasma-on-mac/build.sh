@@ -1,5 +1,22 @@
 #!/bin/bash
 
+dry_run=false
+
+# Parse command-line options
+while getopts "n" opt; do
+  case $opt in
+    n)
+      dry_run=true
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+  esac
+done
+
+shift $((OPTIND - 1))
+
 get_project_directory() {
   local input_dir
 
@@ -77,6 +94,7 @@ for url in \
     "https://github.com/kdha200501/sddm.git"
 do
   project=$(basename "$url" .git)
+  printf "\n%s\n" "$project"
 
   # Clone project (if not found)
   if [ ! -d "$CWD/$project" ]; then
@@ -89,6 +107,7 @@ do
     [[ $GIT_EXIT_STATUS -ne 0 ]] && { printf "\r\e[K❌ Failed to clone $project (Exit code: $GIT_EXIT_STATUS)\n"; exit 1; } || printf "\r\e[K"
   fi
 
+  # Validate project
   if [ ! -d "$CWD/$project/.git" ]; then
     echo "❌ $CWD/$project is not a git repository"
     exit 1
@@ -102,11 +121,20 @@ do
   # Clean up previous logs (if found)
   [ -f "$CWD/build.$project.log" ] && rm "$CWD/build.$project.log"
 
-  # The build process
+
+  # Get branch
   (
-    # Fetch notes and branches
-    git -C "$CWD/$project" fetch origin refs/notes/commits:refs/notes/commits >>"$CWD/build.$project.log" 2>&1
-    git -C "$CWD/$project" fetch --prune >>"$CWD/build.$project.log" 2>&1
+    # Fetch notes
+    git -C "$CWD/$project" fetch origin refs/notes/commits:refs/notes/commits >>"$CWD/build.$project.log" 2>&1 || {
+      echo "❌ Failed to fetch notes for $project, see log at $CWD/build.$project.log"
+      exit 1
+    }
+
+    # Fetch branches
+    git -C "$CWD/$project" fetch --prune >>"$CWD/build.$project.log" 2>&1 || {
+      echo "❌ Failed to fetch branches for $project, see log at $CWD/build.$project.log"
+      exit 1
+    }
 
     # Determine branch from notes
     root_commit=$(git -C "$CWD/$project" rev-list --max-parents=0 origin/master 2>>"$CWD/build.$project.log")
@@ -131,9 +159,25 @@ do
       echo "❌ Failed to reset branch for $project"
       exit 1
     }
+  ) &
 
-    echo "$project [$branch]"
+  JOB_PID=$!
 
+  tail -f --pid=$JOB_PID -n 1 "$CWD/build.$project.log" 2>/dev/null | while read -r line; do
+    printf "\r\e[K📥 %s" "${line:0:(($COLUMNS - 3))}"
+  done
+
+  wait $JOB_PID
+
+  if [ $? -ne 0 ]; then
+    printf "\r\e[K%s\n" "❌ build log: $CWD/build.$project.log"
+    exit 1
+  fi
+
+  printf "\r\e[K🏷 %s\n" $(git -C "$CWD/$project" branch --show-current 2>/dev/null)
+
+  # The build process
+  (
     # Build project from source, install build artifacts into dist folder
     case "$project" in
       aurorae|dolphin|kio|kwin|plasma-workspace|plasma-desktop)
@@ -141,30 +185,39 @@ do
           echo "❌ cmake error, see log at $CWD/build.$project.log"
           exit 1
         }
-        build_and_install_with_make "$project" || {
-          echo "❌ make error, see log at $CWD/build.$project.log"
-          exit 1
-        }
+
+        if [ "$dry_run" = false ]; then
+          build_and_install_with_make "$project" || {
+            echo "❌ make error, see log at $CWD/build.$project.log"
+            exit 1
+          }
+        fi
         ;;
       kscreenlocker)
         cmake -DCMAKE_INSTALL_PREFIX="/usr" -DBUILD_TESTING=OFF -DKDE_INSTALL_LIBEXECDIR=libexec -B "$CWD/$project/build/" -S "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || {
           echo "❌ cmake error, see log at $CWD/build.$project.log"
           exit 1
         }
-        build_and_install_with_make "$project" || {
-          echo "❌ make error, see log at $CWD/build.$project.log"
-          exit 1
-        }
+
+        if [ "$dry_run" = false ]; then
+          build_and_install_with_make "$project" || {
+            echo "❌ make error, see log at $CWD/build.$project.log"
+            exit 1
+          }
+        fi
         ;;
       libinput)
         meson setup --prefix="/usr" -Dversion="$branch" "$CWD/$project/build/" "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || {
           echo "❌ meson error, see log at $CWD/build.$project.log"
           exit 1
         }
-        build_and_install_with_ninja "$project" || {
-          echo "❌ ninja error, see log at $CWD/build.$project.log"
-          exit 1
-        }
+
+        if [ "$dry_run" = false ]; then
+          build_and_install_with_ninja "$project" || {
+            echo "❌ ninja error, see log at $CWD/build.$project.log"
+            exit 1
+          }
+        fi
         ;;
       sddm)
         if [[ ! -f "$CWD/$project/sddm.spec" ]]; then
@@ -172,7 +225,9 @@ do
           exit 1
         fi
 
-        build_and_bundle_with_rpm "$project" "sddm.spec" || exit 1
+        if [ "$dry_run" = false ]; then
+          build_and_bundle_with_rpm "$project" "sddm.spec" || exit 1
+        fi
         ;;
       *)
         echo "❌ No build instructions for $project"
@@ -195,8 +250,17 @@ do
     exit 1
   fi
 
-  printf "\r\e[K%s\n" "✅ build log: $CWD/build.$project.log"
+  if [ "$dry_run" = true ]; then
+    printf "\r\e[K%s\n" "🔍 Dry run is successful, build log: $CWD/build.$project.log"
+    continue
+  fi
+
+  printf "\r\e[K%s\n" "✅ Build is successful, build log: $CWD/build.$project.log"
 done
+
+if [ "$dry_run" = true ]; then
+  exit
+fi
 
 # Bundle up the dist directory into a tarball
 if [[ -d "$CWD/dist/" ]]; then
