@@ -1,5 +1,23 @@
 #!/bin/bash
 
+get_project_directory() {
+  local input_dir
+
+  if [ -z "$1" ]; then
+    read -rp "Enter the path to the projects' parent directory [default: $(pwd)]: " input_dir
+  else
+    input_dir="$1"
+  fi
+
+  if [ -n "$input_dir" ] && [ ! -d "$input_dir" ]; then
+    echo "Error: Directory '$input_dir' does not exist" >&2
+    return 1
+  fi
+
+  input_dir=$([[ "$input_dir" = /* ]] && echo "$input_dir" || echo "$(pwd)/$input_dir")
+  readlink -f "$input_dir"
+}
+
 build_and_install_with_make() {
   local project="$1"
   make -C "$CWD/$project/build/" -j"$(nproc)" >>"$CWD/build.$project.log" 2>&1 || return 1
@@ -37,48 +55,55 @@ build_and_bundle_with_rpm() {
 }
 
 
-# Accept projects directory path as first argument
-if [ -n "$1" ]; then
-  # Check if it's an absolute path
-  if [[ "$1" = /* ]]; then
-    CWD="$1"
-  else
-    CWD="$(pwd)/$1"
-  fi
-else
-  read -rp "Enter the path to the projects' directory [default: $(pwd)]: " input_dir
-  CWD="${input_dir:-$(pwd)}"
-fi
-
 # The projects directory path
+CWD=$(get_project_directory "$1") || exit 1
 CWD="${CWD%/}"
 
-# Validate input
-if [ ! -d "$CWD" ]; then
-  echo "Error: Directory '$CWD' does not exist."
-  exit 1
-fi
-
-# Clean up previous artifacts
+# Clean up previous build artifacts
 [ -d "$CWD/dist" ] && sudo rm -rf "$CWD/dist"
 [ -f "$CWD/dist.tar" ] && rm "$CWD/dist.tar"
 [ -f "$CWD/sddm.rpm" ] && rm "$CWD/sddm.rpm"
 
-# List of projects to build
-projects=(libinput kio dolphin aurorae kscreenlocker kwin plasma-workspace plasma-desktop sddm)
+# Projects to build
+for url in \
+    "https://github.com/kdha200501/libinput.git" \
+    "https://github.com/kdha200501/kio.git" \
+    "https://github.com/kdha200501/dolphin.git" \
+    "https://github.com/kdha200501/aurorae.git" \
+    "https://github.com/kdha200501/kscreenlocker.git" \
+    "https://github.com/kdha200501/kwin.git" \
+    "https://github.com/kdha200501/plasma-workspace.git" \
+    "https://github.com/kdha200501/plasma-desktop.git" \
+    "https://github.com/kdha200501/sddm.git"
+do
+  project=$(basename "$url" .git)
 
-for project in "${projects[@]}"; do
-  echo "$project"
+  # Clone project (if not found)
+  if [ ! -d "$CWD/$project" ]; then
+    git clone "$url" "$CWD/$project" 2>&1 | while read -r line; do
+      printf "\r\e[K📥 %s" "${line:0:(($COLUMNS - 3))}"
+    done
 
-  # Clean up previous logs
+    GIT_EXIT_STATUS=${PIPESTATUS[0]}
+
+    [[ $GIT_EXIT_STATUS -ne 0 ]] && { printf "\r\e[K❌ Failed to clone $project (Exit code: $GIT_EXIT_STATUS)\n"; exit 1; } || printf "\r\e[K"
+  fi
+
+  if [ ! -d "$CWD/$project/.git" ]; then
+    echo "❌ $CWD/$project is not a git repository"
+    exit 1
+  fi
+
+  if [ "$(git -C "$CWD/$project" remote get-url origin 2>/dev/null)" != "$url" ]; then
+    echo "❌ Remote URL mismatch, expecting: $url"
+    exit 1
+  fi
+
+  # Clean up previous logs (if found)
   [ -f "$CWD/build.$project.log" ] && rm "$CWD/build.$project.log"
 
+  # The build process
   (
-    if [[ ! -d "$CWD/$project" ]]; then
-      echo "❌ Project directory not found: $CWD/$project"
-      exit 1
-    fi
-
     # Fetch notes and branches
     git -C "$CWD/$project" fetch origin refs/notes/commits:refs/notes/commits >>"$CWD/build.$project.log" 2>&1
     git -C "$CWD/$project" fetch --prune >>"$CWD/build.$project.log" 2>&1
@@ -86,23 +111,28 @@ for project in "${projects[@]}"; do
     # Determine branch from notes
     root_commit=$(git -C "$CWD/$project" rev-list --max-parents=0 origin/master 2>>"$CWD/build.$project.log")
     if [ -z "$root_commit" ]; then
-      echo "❌ Skipping $project: could not find root commit."
+      echo "❌ Could not find root commit for $project"
       exit 1
     fi
 
     branch=$(git -C "$CWD/$project" notes show "$root_commit" 2>>"$CWD/build.$project.log")
     if [ -z "$branch" ]; then
-      echo "❌ Skipping $project: no branch info in notes."
+      echo "❌ Cannot find branch info for $project"
       exit 1
     fi
 
     # Checkout branch
     git -C "$CWD/$project" checkout "$branch" >>"$CWD/build.$project.log" 2>&1 || {
-      echo "❌ Skipping $project: failed to checkout branch '$branch'."
+      echo "❌ Failed to checkout branch for $project"
       exit 1
     }
 
-    git -C "$CWD/$project" reset --hard "origin/$branch" >>"$CWD/build.$project.log" 2>&1
+    git -C "$CWD/$project" reset --hard "origin/$branch" >>"$CWD/build.$project.log" 2>&1 || {
+      echo "❌ Failed to reset branch for $project"
+      exit 1
+    }
+
+    echo "$project [$branch]"
 
     # Build project from source, install build artifacts into dist folder
     case "$project" in
@@ -145,7 +175,8 @@ for project in "${projects[@]}"; do
         build_and_bundle_with_rpm "$project" "sddm.spec" || exit 1
         ;;
       *)
-        echo "❌ No build instructions for $project. Skipping."
+        echo "❌ No build instructions for $project"
+        exit 1
         ;;
     esac
   ) &
@@ -160,7 +191,8 @@ for project in "${projects[@]}"; do
 
   if [ $? -ne 0 ]; then
     printf "\r\e[K%s\n" "❌ build log: $CWD/build.$project.log"
-    continue
+    # Ensure the build is atomic
+    exit 1
   fi
 
   printf "\r\e[K%s\n" "✅ build log: $CWD/build.$project.log"
