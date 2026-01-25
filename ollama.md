@@ -109,6 +109,23 @@ $ newgrp docker
 $ nohup docker pull ollama/ollama:rocm > $HOME/pull_ollama_log.txt 2>&1 &
 ```
 
+> [!TIP]
+>
+> Updating Ollama requires stopping and removing container and image
+>
+> ```shell
+> $ docker ps
+> $ docker stop ollama-rocm
+> 
+> $ docker ps -a
+> $ docker rm <container-id>
+> 
+> $ docker images
+> $ docker rmi ollama/ollama:rocm
+> ```
+>
+> Then run the `docker pull` above
+
 
 
 ##### Pull docker image for an Ollama Webapp
@@ -262,13 +279,12 @@ $ docker ps
 ```shell
 $ nohup docker exec ollama-rocm ollama pull qwen3-coder:30b > $HOME/qwen_pull.log 2>&1 &
 $ nohup docker exec ollama-rocm ollama pull gemma3:27b > $HOME/gemma_pull.log 2>&1 &
+$ nohup docker exec ollama-rocm ollama pull glm-4.7-flash > $HOME/glm_pull.log 2>&1 &
 ```
 
 > [!TIP]
 >
-> The `qwen2.5-coder` variants are incompatible with `read_file` tool calling
->
-> The `qwen3-coder` variants are compatible with `read_file` tool calling
+> The `qwen3-coder` variants are compatible with tool calling
 >
 > The `gemma3` LLM is multi modal
 >
