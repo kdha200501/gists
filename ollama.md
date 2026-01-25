@@ -171,6 +171,7 @@ services:
     environment:
       - CUDA_VISIBLE_DEVICES=0
       - OLLAMA_KEEP_ALIVE=14400
+      - OLLAMA_CONTEXT_LENGTH=32768
     command: serve
 
   open-webui:
@@ -186,6 +187,10 @@ services:
     networks:
       - ollama_network
 ```
+
+> [!TIP]
+>
+> `OLLAMA_CONTEXT_LENGTH=32768` is a generous window (about 25,000 words)
 
 
 
@@ -308,9 +313,21 @@ $ sudo systemctl enable ollama.service
 
 
 
+##### Identify CPU offloading
+
+```shell
+$ docker exec ollama-rocm ollama ps
+```
+
+> [!TIP]
+>
+> Adjust the `OLLAMA_CONTEXT_LENGTH` environment variable so that there is no split between CPU and GPU
 
 
-# Configure `Continue` coding agent for ollama
+
+
+
+# Connect `Continue` coding agent to Ollama
 
 ```shell
 $ touch "$HOME/.continue/config.yaml"
@@ -339,71 +356,55 @@ models:
 
 
 
-# [Optional] Configure `ollama-code-cli` for ollama
+# Connect `Claude Code CLI` coding agent to Ollama
 
-> [!NOTE]
->
-> `ollama-code-cli` is a wrapper of the `Ollama Python Client` library (ref: [link](https://github.com/ollama/ollama-python)), `ollama-code-cli` provides tool calling.
+The Ollama API is now compatible with OpenAI and Anthropic clients
 
-##### Install the client
+##### Installation
 
 ```shell
-$ pip install ollama-code-cli
-$ atom ~/.bashrc
-```
-
-Add:
-
-```shell
-export OLLAMA_HOST=http://<ip-address>:11434
-alias ollama='ollama-code-cli --model qwen3-coder:30b'
-```
-
-
-
-##### Run the client
-
-```shell
-$ ollama
-```
-
-
-
-
-
-# [Optional] Configure `ollama-code` for ollama
-
-> [!WARNING]
->
-> `ollama-code` is a fork of `qwen-code` (ref: [link](https://github.com/QwenLM/qwen-code)) which is a fork of `gemini-cli` (ref: [link](https://github.com/google-gemini/gemini-cli)), `ollama-code` inherits tool calling, and tool callings are handles it incorrectly. For example, when the model calls the read_file tool, this client fails to generate the absolute path, and when given the absolute path, the path is misinterpreted as a HTTP URL
-
-##### Install the client
-
-```shell
-$ npm install -g @tcsenpai/ollama-code
-$ atom ~/.bashrc
-```
-Add:
-
-```shell
-export OLLAMA_BASE_URL="http://<ip-address>:11434/v1"
-export OLLAMA_API_KEY="dummy"
-export OLLAMA_MODEL="qwen3-coder:30b"
+$ curl -fsSL https://claude.ai/install.sh | bash
 ```
 
 > [!TIP]
 >
-> Ensure globally installed `npm` packages are in the path
->
-> ```shell
-> $ export PATH="$PATH:$(npm config get prefix)/bin"
-> ```
+> The cli is installed at `~/.local/bin/claude `
 
 
 
-##### Run the client
+##### Configuration
 
 ```shell
-$ ollama-code
+$ vim ~/.bashrc
+```
+
+Copy and paste:
+
+```shell
+export ANTHROPIC_BASE_URL="http://<ip-address>:11434"
+export ANTHROPIC_API_KEY="" # Required but ignored by Ollama
+export ANTHROPIC_AUTH_TOKEN="ollama"
+export EDITOR=vim
+```
+
+
+
+```shell
+$ vim ~/.config/git/ignore
+```
+
+Add:
+
+```
+**/.claude/settings.local.json
+**/.mcp.json
+```
+
+
+
+##### Launch
+
+```shell
+$ claude --model qwen3-coder:30b
 ```
 
