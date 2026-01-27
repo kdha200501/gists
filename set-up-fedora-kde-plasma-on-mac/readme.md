@@ -2017,6 +2017,148 @@ $ sudo dnf update @multimedia --setopt="install_weak_deps=False" --exclude=Packa
 
 
 
+# Install Kernel based Virtual Machine
+
+##### Installation
+
+```shell
+$ sudo dnf install @virtualization
+$ sudo systemctl enable --now libvirtd
+$ sudo usermod -aG libvirt $USER
+
+$ virt-manager
+```
+
+> [!TIP]
+>
+> launch **Virtual Machine Manager**
+
+
+
+##### Install virtual machine
+
+- Click "New Virtual Machine" to start
+- Select "Local install media (ISO image or CDROM)"
+  - Click "Browse" -> "Browse Local"
+
+
+
+##### Verify virtual machine network
+
+In the VM window, click the *Lightbulb* icon to show virtual hardware details
+
+- Select *NIC* (Network Interface)
+- Ensure "Network source" is set to `Virtual network 'default' : NAT`
+- Ensure Device model is set to `virtio`
+
+
+
+Ensure a *default* NAT is provided
+
+```shell
+$ sudo virsh net-list --all
+```
+
+
+
+Fedora uses `firewalld` and `nftables`. Recently, a change in how `libvirt` talks to the firewall has caused internet drops for VMs. Fix this by telling `libvirt` to use the older `iptables` backend for networking
+
+```shell
+$ sudo vim /etc/libvirt/network.conf
+```
+
+ensure
+
+```shell
+firewall_backend = "iptables"
+```
+
+
+
+```shell
+$ sudo systemctl restart libvirtd
+```
+
+
+
+##### Set up a network bridge
+
+Instead of using a NAT which puts the virtual machine in another network, a network bridge allows the virtual machine to appear directly on the host's LAN *i.e.* getting their own IP from the router.
+
+
+
+Create a bridge interface named `br0`
+
+```shell
+$ sudo nmcli con add type bridge ifname br0 con-name br0
+```
+
+
+
+Add the host's physical network interface as a member of the bridge
+
+```shell
+$ sudo nmcli con add type bridge-slave ifname <interface-name> master br0 con-name br0-slave
+```
+
+> [!NOTE]
+>
+> Replace <interface-name> with the host machine's network interface.
+
+
+
+Disable Spanning Tree Protocol
+
+```shell
+$ sudo nmcli con modify br0 bridge.stp no
+```
+
+> [!TIP]
+>
+> Reduces latency, safe when there are no network loops
+
+
+
+Bring up the slave connection to attach the physical interface to the bridge
+
+```shell
+$ sudo nmcli con up br0-slave
+```
+
+
+
+Bring up the bridge
+
+```shell
+$ sudo nmcli con up br0
+```
+
+
+
+In the VM window, click the *Lightbulb* icon to show virtual hardware details
+
+- Select *NIC* (Network Interface)
+- Ensure "Network source" is set to `Bridge device : NAT`
+- Ensure Device name is set to `br0`
+- Ensure Device model is set to `virtio`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Install Chinese IME
 
 Neither `fcitx` nor `fcitx5` works, so `ibus` it is
