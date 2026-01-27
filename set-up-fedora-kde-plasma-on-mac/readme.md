@@ -2016,6 +2016,84 @@ $ sudo dnf update @multimedia --setopt="install_weak_deps=False" --exclude=Packa
 
 
 
+# Install Kernel based Virtual Machine
+
+##### Installation
+
+```shell
+$ sudo dnf install @virtualization
+$ sudo systemctl enable --now libvirtd
+$ sudo usermod -aG libvirt $USER
+
+$ virt-manager
+```
+
+> [!TIP]
+>
+> launch **Virtual Machine Manager**
+
+
+
+##### Install virtual machine
+
+- Click "New Virtual Machine" to start
+- Select "Local install media (ISO image or CDROM)"
+  - Click "Browse" -> "Browse Local"
+
+
+
+##### Verify virtual machine network
+
+In the VM window, click the *Lightbulb* icon to show virtual hardware details
+
+- Select *NIC* (Network Interface)
+- Ensure "Network source" is set to `Virtual network 'default' : NAT`
+- Ensure Device model is set to `virtio`
+
+
+
+Ensure a *default* NAT is provided
+
+```shell
+$ sudo virsh net-list --all
+```
+
+
+
+Fedora uses `firewalld` and `nftables`. Recently, a change in how `libvirt` talks to the firewall has caused internet drops for VMs. Fix this by telling `libvirt` to use the older `iptables` backend for networking
+
+```shell
+$ sudo vim /etc/libvirt/network.conf
+```
+
+ensure
+
+```shell
+firewall_backend = "iptables"
+```
+
+
+
+```shell
+$ sudo systemctl restart libvirtd
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Install Chinese IME
 
 Neither `fcitx` nor `fcitx5` works, so `ibus` it is
