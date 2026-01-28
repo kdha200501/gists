@@ -1,12 +1,19 @@
 #!/bin/bash
 
 dry_run=false
+list=false
+
+# Repository URLs
+REPOS_JSON='["https://github.com/kdha200501/libinput.git","https://github.com/kdha200501/kio.git","https://github.com/kdha200501/dolphin.git","https://github.com/kdha200501/aurorae.git","https://github.com/kdha200501/kscreenlocker.git","https://github.com/kdha200501/kwin.git","https://github.com/kdha200501/plasma-workspace.git","https://github.com/kdha200501/plasma-desktop.git","https://github.com/kdha200501/sddm.git"]'
 
 # Parse command-line options
-while getopts "n" opt; do
+while getopts "nl" opt; do
   case $opt in
     n)
       dry_run=true
+      ;;
+    l)
+      list=true
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -16,6 +23,12 @@ while getopts "n" opt; do
 done
 
 shift $((OPTIND - 1))
+
+# List repositories and exit
+if [ "$list" = true ]; then
+  jq -r '.[]' <<< "$REPOS_JSON"
+  exit 0
+fi
 
 get_project_directory() {
   local input_dir
@@ -82,17 +95,7 @@ CWD="${CWD%/}"
 [ -f "$CWD/sddm.rpm" ] && rm "$CWD/sddm.rpm"
 
 # Projects to build
-for url in \
-    "https://github.com/kdha200501/libinput.git" \
-    "https://github.com/kdha200501/kio.git" \
-    "https://github.com/kdha200501/dolphin.git" \
-    "https://github.com/kdha200501/aurorae.git" \
-    "https://github.com/kdha200501/kscreenlocker.git" \
-    "https://github.com/kdha200501/kwin.git" \
-    "https://github.com/kdha200501/plasma-workspace.git" \
-    "https://github.com/kdha200501/plasma-desktop.git" \
-    "https://github.com/kdha200501/sddm.git"
-do
+for url in $(jq -r '.[]' <<< "$REPOS_JSON"); do
   project=$(basename "$url" .git)
   printf "\n%s\n" "$project"
 
