@@ -2,18 +2,22 @@
 
 dry_run=false
 list=false
+repo=""
 
 # Repository URLs
 REPOS_JSON='["https://github.com/kdha200501/libinput.git","https://github.com/kdha200501/kio.git","https://github.com/kdha200501/dolphin.git","https://github.com/kdha200501/aurorae.git","https://github.com/kdha200501/kscreenlocker.git","https://github.com/kdha200501/kwin.git","https://github.com/kdha200501/plasma-workspace.git","https://github.com/kdha200501/plasma-desktop.git","https://github.com/kdha200501/sddm.git"]'
 
 # Parse command-line options
-while getopts "nl" opt; do
+while getopts "nlr:" opt; do
   case $opt in
     n)
       dry_run=true
       ;;
     l)
       list=true
+      ;;
+    r)
+      repo="$OPTARG"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -23,6 +27,21 @@ while getopts "nl" opt; do
 done
 
 shift $((OPTIND - 1))
+
+# Validate repo option
+validate_repo() {
+  for url in $(jq -r '.[]' <<< "$REPOS_JSON"); do
+    if [ "$url" = "$repo" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+if [[ -n "$repo" && ! $(validate_repo) ]]; then
+  echo "❌ Repository '$repo' is not in REPOS_JSON" >&2
+  exit 1
+fi
 
 # List repositories and exit
 if [ "$list" = true ]; then
@@ -40,7 +59,7 @@ get_project_directory() {
   fi
 
   if [ -n "$input_dir" ] && [ ! -d "$input_dir" ]; then
-    echo "Error: Directory '$input_dir' does not exist" >&2
+    echo "❌ Directory '$input_dir' does not exist" >&2
     return 1
   fi
 
@@ -96,6 +115,10 @@ CWD="${CWD%/}"
 
 # Projects to build
 for url in $(jq -r '.[]' <<< "$REPOS_JSON"); do
+  if [ -n "$repo" ] && [ "$url" != "$repo" ]; then
+    continue
+  fi
+
   project=$(basename "$url" .git)
   printf "\n%s\n" "$project"
 
@@ -261,9 +284,7 @@ for url in $(jq -r '.[]' <<< "$REPOS_JSON"); do
   printf "\r\e[K%s\n" "✅ Build is successful, build log: $CWD/build.$project.log"
 done
 
-if [ "$dry_run" = true ]; then
-  exit
-fi
+[ -n "$repo" ] || [ "$dry_run" = true ] && exit
 
 # Bundle up the dist directory into a tarball
 if [[ -d "$CWD/dist/" ]]; then
