@@ -1,23 +1,49 @@
 #!/bin/bash
 
+# Parse command-line options
 dry_run=false
 list=false
-repo=""
+package_option=""
+projects_dir=""
 
-# Repository URLs
-REPOS_JSON='["https://github.com/kdha200501/libinput.git","https://github.com/kdha200501/kio.git","https://github.com/kdha200501/dolphin.git","https://github.com/kdha200501/aurorae.git","https://github.com/kdha200501/kscreenlocker.git","https://github.com/kdha200501/kwin.git","https://github.com/kdha200501/plasma-workspace.git","https://github.com/kdha200501/plasma-desktop.git","https://github.com/kdha200501/sddm.git"]'
-
-# Parse command-line options
-while getopts "nlr:" opt; do
+while getopts "hnlp:C:" opt; do
   case $opt in
+    h)
+      cat <<-EOF
+      Usage: $0 [OPTIONS] [REPO]
+
+      Build and bundle KDE packages from forked repository.
+
+      Options:
+        -h, --help          Show this help message
+        -n, --dry-run       Perform a dry run (no actual building/bundling)
+        -l, --list          List all available forked repositories to compare version with upstream
+        -p, --package NAME  Specify a single package to build (e.g., kwin) and skip the bundling step
+        -C, --cwd PATH      Specify the projects' parent directory (default: current directory)
+
+      Forked repositories:
+        libinput, kf6-kio, dolphin, aurorae, kscreenlocker, kwin,
+        plasma-workspace, plasma-desktop, sddm
+
+      Examples:
+        $0 -l                            # List all forked repositories
+        $0 -p kwin                       # Build only kwin
+        $0 -n -p dolphin                 # Dry run for dolphin
+        $0 -C /path/to/projects          # Use custom projects directory
+EOF
+      exit 0
+      ;;
     n)
       dry_run=true
       ;;
     l)
       list=true
       ;;
-    r)
-      repo="$OPTARG"
+    p)
+      package_option="$OPTARG"
+      ;;
+    C)
+      projects_dir="$OPTARG"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -28,46 +54,48 @@ done
 
 shift $((OPTIND - 1))
 
-# Validate repo option
-validate_repo() {
-  for url in $(jq -r '.[]' <<< "$REPOS_JSON"); do
-    if [ "$url" = "$repo" ]; then
-      return 0
-    fi
+# Function to validate the package option
+validate_package_option() {
+  for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
+    [ "$(jq -r '.name' <<< "$package")" = "$package_option" ] && return 0
   done
+
   return 1
 }
 
-get_project_directory() {
-  local input_dir
+# Function to get the projects' directory
+get_projects_directory_option() {
+  local input_dir="$projects_dir"
 
-  if [ -z "$1" ]; then
+  if [ -z "$input_dir" ]; then
     read -rp "Enter the path to the projects' parent directory [default: $(pwd)]: " input_dir
-  else
-    input_dir="$1"
   fi
 
-  if [ -n "$input_dir" ] && [ ! -d "$input_dir" ]; then
-    echo "❌ Directory '$input_dir' does not exist" >&2
-    return 1
+  if [ -z "$input_dir" ]; then
+    input_dir="$(pwd)"
   fi
+
+  [ ! -d "$input_dir" ] && return 1
 
   input_dir=$([[ "$input_dir" = /* ]] && echo "$input_dir" || echo "$(pwd)/$input_dir")
   readlink -f "$input_dir"
 }
 
+# Function to build and install with make
 build_and_install_with_make() {
   local project="$1"
   make -C "$CWD/$project/build/" -j"$(nproc)" >>"$CWD/build.$project.log" 2>&1 || return 1
   sudo make -C "$CWD/$project/build/" install DESTDIR="$CWD/dist/" >>"$CWD/build.$project.log" 2>&1 || return 1
 }
 
+# Function to build and install with ninja
 build_and_install_with_ninja() {
   local project="$1"
   ninja -C "$CWD/$project/build/" -j"$(nproc)" >>"$CWD/build.$project.log" 2>&1 || return 1
   sudo env DESTDIR="$CWD/dist/" ninja -C "$CWD/$project/build/" install >>"$CWD/build.$project.log" 2>&1 || return 1
 }
 
+# Function to build and bundle with rpm
 build_and_bundle_with_rpm() {
   local project="$1"
   local spec_filename="$2"
@@ -92,38 +120,56 @@ build_and_bundle_with_rpm() {
   env HOME="$tmp_dir" rpmbuild -bb "$spec_file" >>"$CWD/build.$project.log" 2>&1 || return 1
 }
 
-# List repositories and exit
-if [ "$list" = true ]; then
-  jq -r '.[]' <<< "$REPOS_JSON"
-  exit 0
-fi
+# Vet the projects directory option
+projects_dir=$(get_projects_directory_option)
+[[ ! $? ]] && { echo "❌ Invalid projects directory" >&2; exit 1; }
+CWD="${projects_dir%/}"
 
-if [[ -n "$repo" && ! $(validate_repo) ]]; then
-  echo "❌ Repository '$repo' is not in REPOS_JSON" >&2
-  exit 1
+# Vet the package option
+PACKAGE_JSON=$(cat <<-"EOF"
+[
+  { "name": "libinput",          "fork": "https://github.com/kdha200501/libinput.git"         },
+  { "name": "kf6-kio",           "fork": "https://github.com/kdha200501/kio.git"              },
+  { "name": "dolphin",           "fork": "https://github.com/kdha200501/dolphin.git"          },
+  { "name": "aurorae",           "fork": "https://github.com/kdha200501/aurorae.git"          },
+  { "name": "kscreenlocker",     "fork": "https://github.com/kdha200501/kscreenlocker.git"    },
+  { "name": "kwin",              "fork": "https://github.com/kdha200501/kwin.git"             },
+  { "name": "plasma-workspace",  "fork": "https://github.com/kdha200501/plasma-workspace.git" },
+  { "name": "plasma-desktop",    "fork": "https://github.com/kdha200501/plasma-desktop.git"   },
+  { "name": "sddm",              "fork": "https://github.com/kdha200501/sddm.git"             }
+]
+EOF
+)
+if [ -n "$package_option" ]; then
+  validate_package_option
+  [ $? -ne 0 ] && { echo "❌ Unknown repository '$package_option'" >&2; exit 1; }
 fi
-
-# The projects directory path
-CWD=$(get_project_directory "$1") || exit 1
-CWD="${CWD%/}"
 
 # Clean up previous build artifacts
-[ -d "$CWD/dist" ] && sudo rm -rf "$CWD/dist"
-[ -f "$CWD/dist.tar" ] && rm "$CWD/dist.tar"
-[ -f "$CWD/sddm.rpm" ] && rm "$CWD/sddm.rpm"
+if [ "$list" = false ]; then
+  [ -d "$CWD/dist" ] && sudo rm -rf "$CWD/dist"
+  [ -f "$CWD/dist.tar" ] && rm "$CWD/dist.tar"
+  [ -f "$CWD/sddm.rpm" ] && rm "$CWD/sddm.rpm"
+fi
 
-# Projects to build
-for url in $(jq -r '.[]' <<< "$REPOS_JSON"); do
-  if [ -n "$repo" ] && [ "$url" != "$repo" ]; then
+# Go through packages' forked repositories
+for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
+  package_name=$(jq -r '.name' <<< "$package")
+
+  if [ "$list" = false ] && [ -n "$package_option" ] && [ "$package_name" != "$package_option" ]; then
     continue
   fi
 
-  project=$(basename "$url" .git)
-  printf "\n%s\n" "$project"
+  printf "\n%s\n" "$package_name"
 
-  # Clone project (if not found)
-  if [ ! -d "$CWD/$project" ]; then
-    git clone "$url" "$CWD/$project" 2>&1 | while read -r line; do
+  package_fork=$(jq -r '.fork' <<< "$package")
+
+  project=$(basename "$package_fork" .git)
+  project_dir="$CWD/$project"
+
+  # Clone the package's repository (if not found)
+  if [ ! -d "$project_dir" ]; then
+    git clone "$package_fork" "$project_dir" 2>&1 | while read -r line; do
       printf "\r\e[K📥 %s" "${line:0:(($COLUMNS - 3))}"
     done
 
@@ -132,121 +178,127 @@ for url in $(jq -r '.[]' <<< "$REPOS_JSON"); do
     [[ $GIT_EXIT_STATUS -ne 0 ]] && { printf "\r\e[K❌ Failed to clone $project (Exit code: $GIT_EXIT_STATUS)\n"; exit 1; } || printf "\r\e[K"
   fi
 
-  # Validate project
-  if [ ! -d "$CWD/$project/.git" ]; then
-    echo "❌ $CWD/$project is not a git repository"
+  # Validate the package's repository
+  if [ ! -d "$project_dir/.git" ]; then
+    echo "❌ $project_dir is not a git repository"
     exit 1
   fi
 
-  if [ "$(git -C "$CWD/$project" remote get-url origin 2>/dev/null)" != "$url" ]; then
-    echo "❌ Remote URL mismatch, expecting: $url"
+  if [ "$(git -C "$project_dir" remote get-url origin 2>/dev/null)" != "$package_fork" ]; then
+    echo "❌ Remote URL mismatch, expecting: $package_fork"
     exit 1
   fi
 
   # Clean up previous logs (if found)
-  [ -f "$CWD/build.$project.log" ] && rm "$CWD/build.$project.log"
-
+  log_file="$CWD/build.$project.log"
+  [ -f "$log_file" ] && rm "$log_file"
 
   # Get branch
   (
     # Fetch notes
-    git -C "$CWD/$project" fetch origin refs/notes/commits:refs/notes/commits >>"$CWD/build.$project.log" 2>&1 || {
-      echo "❌ Failed to fetch notes for $project, see log at $CWD/build.$project.log"
+    git -C "$project_dir" fetch origin refs/notes/commits:refs/notes/commits >>"$log_file" 2>&1 || {
+      echo "❌ Failed to fetch notes for $project, see log at $log_file"
       exit 1
     }
 
     # Fetch branches
-    git -C "$CWD/$project" fetch --prune >>"$CWD/build.$project.log" 2>&1 || {
-      echo "❌ Failed to fetch branches for $project, see log at $CWD/build.$project.log"
+    git -C "$project_dir" fetch --prune >>"$log_file" 2>&1 || {
+      echo "❌ Failed to fetch branches for $project, see log at $log_file"
       exit 1
     }
 
     # Determine branch from notes
-    root_commit=$(git -C "$CWD/$project" rev-list --max-parents=0 origin/master 2>>"$CWD/build.$project.log")
+    root_commit=$(git -C "$project_dir" rev-list --max-parents=0 origin/master 2>>"$log_file")
     if [ -z "$root_commit" ]; then
       echo "❌ Could not find root commit for $project"
       exit 1
     fi
 
-    branch=$(git -C "$CWD/$project" notes show "$root_commit" 2>>"$CWD/build.$project.log")
+    branch=$(git -C "$project_dir" notes show "$root_commit" 2>>"$log_file")
     if [ -z "$branch" ]; then
       echo "❌ Cannot find branch info for $project"
       exit 1
     fi
 
     # Checkout branch
-    git -C "$CWD/$project" checkout "$branch" >>"$CWD/build.$project.log" 2>&1 || {
+    git -C "$project_dir" checkout "$branch" >>"$log_file" 2>&1 || {
       echo "❌ Failed to checkout branch for $project"
       exit 1
     }
 
-    git -C "$CWD/$project" reset --hard "origin/$branch" >>"$CWD/build.$project.log" 2>&1 || {
+    git -C "$project_dir" reset --hard "origin/$branch" >>"$log_file" 2>&1 || {
       echo "❌ Failed to reset branch for $project"
       exit 1
     }
   ) &
 
-  JOB_PID=$!
+  get_branch_pid=$!
 
-  tail -f --pid=$JOB_PID -n 1 "$CWD/build.$project.log" 2>/dev/null | while read -r line; do
+  tail -f --pid=$get_branch_pid -n 1 "$log_file" 2>/dev/null | while read -r line; do
     printf "\r\e[K📥 %s" "${line:0:(($COLUMNS - 3))}"
   done
 
-  wait $JOB_PID
+  wait $get_branch_pid
 
   if [ $? -ne 0 ]; then
-    printf "\r\e[K%s\n" "❌ build log: $CWD/build.$project.log"
+    printf "\r\e[K%s\n" "❌ build log: $log_file"
     exit 1
   fi
 
-  printf "\r\e[K🏷 %s\n" $(git -C "$CWD/$project" branch --show-current 2>/dev/null)
+  printf "\r\e[K🔀 %s\n" $(git -C "$project_dir" branch --show-current 2>/dev/null)
+
+  if [ "$list" = true ]; then
+    package_tag=$(dnf --releasever=$(rpm -E %fedora) repoquery --queryformat="%{VERSION}" --latest-limit=1 "$package_name" 2>/dev/null)
+    echo "🏷 $package_tag"
+    continue
+  fi
 
   # The build process
   (
     # Build project from source, install build artifacts into dist folder
     case "$project" in
       aurorae|dolphin|kio|kwin|plasma-workspace|plasma-desktop)
-        cmake -DCMAKE_INSTALL_PREFIX="/usr" -DBUILD_TESTING=OFF -B "$CWD/$project/build/" -S "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || {
-          echo "❌ cmake error, see log at $CWD/build.$project.log"
+        cmake -DCMAKE_INSTALL_PREFIX="/usr" -DBUILD_TESTING=OFF -B "$project_dir/build/" -S "$project_dir/" >>"$log_file" 2>&1 || {
+          echo "❌ cmake error, see log at $log_file"
           exit 1
         }
 
         if [ "$dry_run" = false ]; then
           build_and_install_with_make "$project" || {
-            echo "❌ make error, see log at $CWD/build.$project.log"
+            echo "❌ make error, see log at $log_file"
             exit 1
           }
         fi
         ;;
       kscreenlocker)
-        cmake -DCMAKE_INSTALL_PREFIX="/usr" -DBUILD_TESTING=OFF -DKDE_INSTALL_LIBEXECDIR=libexec -B "$CWD/$project/build/" -S "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || {
-          echo "❌ cmake error, see log at $CWD/build.$project.log"
+        cmake -DCMAKE_INSTALL_PREFIX="/usr" -DBUILD_TESTING=OFF -DKDE_INSTALL_LIBEXECDIR=libexec -B "$project_dir/build/" -S "$project_dir/" >>"$log_file" 2>&1 || {
+          echo "❌ cmake error, see log at $log_file"
           exit 1
         }
 
         if [ "$dry_run" = false ]; then
           build_and_install_with_make "$project" || {
-            echo "❌ make error, see log at $CWD/build.$project.log"
+            echo "❌ make error, see log at $log_file"
             exit 1
           }
         fi
         ;;
       libinput)
-        meson setup --prefix="/usr" -Dversion="$branch" "$CWD/$project/build/" "$CWD/$project/" >>"$CWD/build.$project.log" 2>&1 || {
-          echo "❌ meson error, see log at $CWD/build.$project.log"
+        meson setup --prefix="/usr" -Dversion="$branch" "$project_dir/build/" "$project_dir/" >>"$log_file" 2>&1 || {
+          echo "❌ meson error, see log at $log_file"
           exit 1
         }
 
         if [ "$dry_run" = false ]; then
           build_and_install_with_ninja "$project" || {
-            echo "❌ ninja error, see log at $CWD/build.$project.log"
+            echo "❌ ninja error, see log at $log_file"
             exit 1
           }
         fi
         ;;
       sddm)
-        if [[ ! -f "$CWD/$project/sddm.spec" ]]; then
-          echo "❌ Spec file not found: $CWD/$project/sddm.spec"
+        if [[ ! -f "$project_dir/sddm.spec" ]]; then
+          echo "❌ Spec file not found: $project_dir/sddm.spec"
           exit 1
         fi
 
@@ -261,29 +313,29 @@ for url in $(jq -r '.[]' <<< "$REPOS_JSON"); do
     esac
   ) &
 
-  JOB_PID=$!
+  build_pid=$!
 
-  tail -f --pid=$JOB_PID -n 1 "$CWD/build.$project.log" 2>/dev/null | while read -r line; do
+  tail -f --pid=$build_pid -n 1 "$log_file" 2>/dev/null | while read -r line; do
     printf "\r\e[K🚀 %s" "${line:0:(($COLUMNS - 3))}"
   done
 
-  wait $JOB_PID
+  wait $build_pid
 
   if [ $? -ne 0 ]; then
-    printf "\r\e[K%s\n" "❌ build log: $CWD/build.$project.log"
+    printf "\r\e[K%s\n" "❌ build log: $log_file"
     # Ensure the build is atomic
     exit 1
   fi
 
   if [ "$dry_run" = true ]; then
-    printf "\r\e[K%s\n" "🔍 Dry run is successful, build log: $CWD/build.$project.log"
+    printf "\r\e[K%s\n" "🔍 Dry run is successful, build log: $log_file"
     continue
   fi
 
-  printf "\r\e[K%s\n" "✅ Build is successful, build log: $CWD/build.$project.log"
+  printf "\r\e[K%s\n" "✅ Build is successful, build log: $log_file"
 done
 
-[ -n "$repo" ] || [ "$dry_run" = true ] && exit
+[ "$list" = true ] || [ -n "$package_option" ] || [ "$dry_run" = true ] && exit
 
 # Bundle up the dist directory into a tarball
 if [[ -d "$CWD/dist/" ]]; then
