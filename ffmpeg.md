@@ -1,3 +1,56 @@
+# Convert video for iPad 2
+
+##### batch process
+
+```shell
+#!/bin/bash
+
+OUTPUT_DIR="./output"
+mkdir -p "$OUTPUT_DIR"
+
+for f in *.mkv; do
+    output="$OUTPUT_DIR/${f%.mkv}.mp4"
+
+    if [ -f "$output" ]; then
+        echo "Skipping — already exists: $output"
+        continue
+    fi
+
+    echo "Converting: $f"
+    ffmpeg -nostdin -i "$f" \
+        -vf "scale=-2:720" \
+        -c:v libx264 \
+        -profile:v main \
+        -level 3.1 \
+        -crf 23 \
+        -preset slow \
+        -c:a aac \
+        -b:a 128k \
+        -movflags +faststart \
+        "$output"
+done
+```
+
+> [!TIP]
+>
+> - `-vf scale=-2:720` scales to 720p while preserving the aspect ratio
+>
+> - `-profile:v main -level 3.1` targets the iPad 2's maximum supported H.264 profile
+>
+> - `-crf 23` constant quality mode — lower = better quality, larger file (18–28 is a sane range)
+>
+> - `-preset slow` better compression at the cost of encoding time
+>
+> - `-movflags +faststart` moves metadata to the front of the file for faster playback start
+
+> [!NOTE]
+>
+> Run with `nohup` to keep it going if the SSH session drops:
+>
+> ```shell
+> $ nohup ./convert-for-ipad.sh > convert.log 2>&1 &
+> ```
+
 # Replace meta data in audio file
 
 ##### sample `tracks.json`
