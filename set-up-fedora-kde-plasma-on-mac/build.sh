@@ -224,7 +224,7 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
   # Get fork version
   (
     # Fetch notes
-    git -C "$project_dir" fetch origin refs/notes/commits:refs/notes/commits >>"$log_file" 2>&1 || {
+    git -C "$project_dir" fetch origin "refs/notes/f$FEDORA_VERSION:refs/notes/f$FEDORA_VERSION" >>"$log_file" 2>&1 || {
       echo "❌ Failed to fetch notes for $project, see log at $log_file" >>"$log_file" 2>&1
       exit 1
     }
@@ -242,7 +242,7 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
       exit 1
     fi
 
-    branch=$(git -C "$project_dir" notes show "$root_commit" 2>>"$log_file")
+    branch=$(git -C "$project_dir" notes --ref "f$FEDORA_VERSION" show "$root_commit" 2>>"$log_file")
     if [ -z "$branch" ]; then
       echo "❌ Cannot find branch info for $project" >>"$log_file" 2>&1
       exit 1
