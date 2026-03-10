@@ -1425,7 +1425,7 @@ $ sudo reboot
 
 ##### The background image for the lock screen
 
-- under "System Settings" -> "Colors & Themes" -> "Login Screen (SDDM)" -> "Change Background Image"
+- under "System Settings" -> "Colors & Themes" -> "Login Screen" -> "Change Background Image"
   - system wall papers are located at `/usr/share/wallpapers/`
   
   - customize user profile picture
@@ -1491,7 +1491,7 @@ For example, switching to Mac OS cursor icons:
 
 - search for "Mac OS by dcppdp"
 
-Under "System Settings" -> "Colors & Themes" -> "Login Screen (SDDM)" -> "Apply Plasma Settings"
+Under "System Settings" -> "Colors & Themes" -> "Login Screen" -> "Apply Plasma Settings"
 
 
 
@@ -1847,7 +1847,7 @@ https://github.com/kdha200501/plasma-workspace
 
 https://github.com/kdha200501/plasma-desktop
 
-https://github.com/kdha200501/sddm
+https://github.com/kdha200501/plasma-login-manager
 
 
 

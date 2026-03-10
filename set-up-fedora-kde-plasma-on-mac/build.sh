@@ -149,7 +149,7 @@ PACKAGE_JSON=$(cat <<"EOF"
   { "name": "kwin",              "fork": "https://github.com/kdha200501/kwin.git"             },
   { "name": "plasma-workspace",  "fork": "https://github.com/kdha200501/plasma-workspace.git" },
   { "name": "plasma-desktop",    "fork": "https://github.com/kdha200501/plasma-desktop.git"   },
-  { "name": "sddm",              "fork": "https://github.com/kdha200501/sddm.git"             }
+  { "name": "plasma-login-manager",              "fork": "https://github.com/kdha200501/plasma-login-manager.git"             }
 ]
 EOF
 )
@@ -164,7 +164,7 @@ TARBALL_NAME="dist-f$FEDORA_VERSION.tar.gz"
 if [ "$list" = false ]; then
   [ -d "$CWD/dist" ] && sudo rm -rf "$CWD/dist"
   [ -f "$CWD/$TARBALL_NAME" ] && rm "$CWD/$TARBALL_NAME"
-  [ -f "$CWD/sddm.rpm" ] && rm "$CWD/sddm.rpm"
+  [ -f "$CWD/plasma-login-manager.rpm" ] && rm "$CWD/plasma-login-manager.rpm"
 fi
 
 # Go through packages' fork
@@ -339,19 +339,19 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
           }
         fi
         ;;
-      sddm)
+      plasma-login-manager)
         sudo dnf --refresh builddep -y "$package_name" >>"$log_file" 2>&1 || {
           echo "❌ dnf builddep error, see log at $log_file" >>"$log_file" 2>&1
           exit 1
         }
 
-        if [[ ! -f "$project_dir/sddm.spec" ]]; then
-          echo "❌ Spec file not found: $project_dir/sddm.spec" >>"$log_file" 2>&1
+        if [[ ! -f "$project_dir/plasma-login-manager.spec" ]]; then
+          echo "❌ Spec file not found: $project_dir/plasma-login-manager.spec" >>"$log_file" 2>&1
           exit 1
         fi
 
         if [ "$dry_run" != "no-compile" ]; then
-          build_and_bundle_with_rpm "$project" "sddm.spec" || exit 1
+          build_and_bundle_with_rpm "$project" "plasma-login-manager.spec" || exit 1
         fi
         ;;
       *)
@@ -400,7 +400,7 @@ else
 fi
 
 # Move rpm files to the CWD
-sddm_project="$CWD/sddm"
+sddm_project="$CWD/plasma-login-manager"
 sddm_x86_64_rpm="$(find "$sddm_project" -type f -name '*x86_64.rpm' | head -n 1)"
 if [[ -n "$sddm_x86_64_rpm" && -f "$sddm_x86_64_rpm" ]]; then
   echo "Moving $sddm_x86_64_rpm"
