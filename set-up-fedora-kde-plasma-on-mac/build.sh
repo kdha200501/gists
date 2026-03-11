@@ -451,15 +451,8 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
           [[ "$file" != http* && -f "$project_dir/$file" ]] && cp "$project_dir/$file" "$dist_dir/rpmbuild/SOURCES/" >>"$log_file" 2>&1
         done
 
-        perform_compile "$dry_run" && {
+        [ "$dry_run" = "no-bundle" ] && {
           env HOME="$dist_dir" rpmbuild -bc "$project_dir/$project.spec" >>"$log_file" 2>&1 || {
-            echo "❌ rpmbuild error, see log at $log_file" >>"$log_file" 2>&1
-            exit 1
-          }
-        }
-
-        perform_install "$dry_run" && {
-          env HOME="$dist_dir" rpmbuild --short-circuit -bi "$project_dir/$project.spec" >>"$log_file" 2>&1 || {
             echo "❌ rpmbuild error, see log at $log_file" >>"$log_file" 2>&1
             exit 1
           }
@@ -495,7 +488,7 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
           fi
           ;;
         rpm)
-          env HOME="$dist_dir" rpmbuild --short-circuit -bb "$project_dir/$project.spec" >>"$log_file" 2>&1 || {
+          env HOME="$dist_dir" rpmbuild -bb "$project_dir/$project.spec" >>"$log_file" 2>&1 || {
             echo "❌ rpmbuild error, see log at $log_file" >>"$log_file" 2>&1
             exit 1
           }
@@ -516,7 +509,7 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
               exit 1
             }
             printf "\r\e[K%s\n" "💾 $CWD/$(basename "$rpm_file")"
-            printf "\r\e[K%s\n" "📌 sudo rpm -Uvh --nodeps --force $CWD/$(basename "$rpm_file")"
+            printf "\r\e[K%s\n" "📌 sudo dnf reinstall \"$CWD/$(basename "$rpm_file")\""
           done
           ;;
       esac
