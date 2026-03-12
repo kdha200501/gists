@@ -218,6 +218,7 @@ PACKAGE_JSON=$(cat <<"EOF"
   { "name": "aurorae",              "fork": "https://github.com/kdha200501/aurorae.git",              "type": "tarball" },
   { "name": "kscreenlocker",        "fork": "https://github.com/kdha200501/kscreenlocker.git",        "type": "tarball" },
   { "name": "kwin",                 "fork": "https://github.com/kdha200501/kwin.git",                 "type": "tarball" },
+  { "name": "kdeplasma-addons",     "fork": "https://github.com/kdha200501/kdeplasma-addons.git",     "type": "tarball" },
   { "name": "plasma-workspace",     "fork": "https://github.com/kdha200501/plasma-workspace.git",     "type": "tarball" },
   { "name": "plasma-desktop",       "fork": "https://github.com/kdha200501/plasma-desktop.git",       "type": "tarball" }
 ]
@@ -374,39 +375,13 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
           }
         }
         ;;
-      aurorae|dolphin|kio|kwin|plasma-workspace|plasma-desktop)
+      aurorae|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker)
         sudo dnf --refresh builddep -y "$package_name" >>"$log_file" 2>&1 || {
           echo "❌ dnf builddep error, see log at $log_file" >>"$log_file" 2>&1
           exit 1
         }
 
-        cmake -B "$project_dir/build/" -S "$project_dir/" -DCMAKE_INSTALL_PREFIX="/usr" -DCMAKE_BUILD_TYPE="Release" -DBUILD_TESTING=OFF -DKDE_INSTALL_USE_QT_SYS_PATHS=ON -DCMAKE_INSTALL_LIBDIR=lib64 -DQT_MAJOR_VERSION=6 -DKDE_INSTALL_SYSCONFDIR=/etc -DKDE_INSTALL_LOCALSTATEDIR=/var >>"$log_file" 2>&1 || {
-          echo "❌ cmake error, see log at $log_file" >>"$log_file" 2>&1
-          exit 1
-        }
-
-        perform_compile "$dry_run" && {
-          make -C "$project_dir/build/" -j"$(nproc)" >>"$log_file" 2>&1 || {
-            echo "❌ make error, see log at $log_file" >>"$log_file" 2>&1
-            exit 1
-          }
-        }
-
-        perform_install "$dry_run" && {
-          [ -d "$dist_dir" ] && sudo rm -rf "$dist_dir"
-          sudo make -C "$project_dir/build/" install DESTDIR="$dist_dir/" >>"$log_file" 2>&1 || {
-            echo "❌ make install error, see log at $log_file" >>"$log_file" 2>&1
-            exit 1
-          }
-        }
-        ;;
-      kscreenlocker)
-        sudo dnf --refresh builddep -y "$package_name" >>"$log_file" 2>&1 || {
-          echo "❌ dnf builddep error, see log at $log_file" >>"$log_file" 2>&1
-          exit 1
-        }
-
-        cmake -B "$project_dir/build/" -S "$project_dir/" -DCMAKE_INSTALL_PREFIX="/usr" -DCMAKE_BUILD_TYPE="Release" -DBUILD_TESTING=OFF -DKDE_INSTALL_USE_QT_SYS_PATHS=ON -DCMAKE_INSTALL_LIBDIR=lib64 -DQT_MAJOR_VERSION=6 -DKDE_INSTALL_SYSCONFDIR=/etc -DKDE_INSTALL_LIBEXECDIR=libexec -DPAM_OS_CONFIGURATION="fedora" >>"$log_file" 2>&1 || {
+        cmake -B "$project_dir/build/" -S "$project_dir/" -DCMAKE_INSTALL_PREFIX="/usr" -DCMAKE_BUILD_TYPE="Release" -DBUILD_TESTING=OFF -DKDE_INSTALL_USE_QT_SYS_PATHS=ON -DCMAKE_INSTALL_LIBDIR=lib64 -DQT_MAJOR_VERSION=6 -DKDE_INSTALL_SYSCONFDIR=/etc -DKDE_INSTALL_LOCALSTATEDIR=/var -DKDE_INSTALL_LIBEXECDIR=libexec -DPAM_OS_CONFIGURATION="fedora" >>"$log_file" 2>&1 || {
           echo "❌ cmake error, see log at $log_file" >>"$log_file" 2>&1
           exit 1
         }

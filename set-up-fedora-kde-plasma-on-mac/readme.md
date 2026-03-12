@@ -918,6 +918,11 @@ Launch "System Settings"
 Go to "Window Management" -> "Task Switcher" -> "Main"
 
 - select "Large Icons"
+
+> [!TIP]
+>
+> ​	The "Large Icons" task switcher is modified to display the application name
+
 - enable "Only one window per application"
 
 
@@ -1806,6 +1811,8 @@ https://github.com/kdha200501/aurorae
 https://github.com/kdha200501/kscreenlocker
 
 https://github.com/kdha200501/kwin
+
+https://github.com/kdha200501/kdeplasma-addons
 
 https://github.com/kdha200501/plasma-workspace
 
