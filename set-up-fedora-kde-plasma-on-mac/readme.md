@@ -918,17 +918,10 @@ Launch "System Settings"
 Go to "Window Management" -> "Task Switcher" -> "Main"
 
 - select "Large Icons"
-- enable "Only one window per application"
 
-
-
-##### Do not hide other windows when tabbing through windows
-
-Launch "System Settings"
-
-Go to "Window Management" -> "Task Switcher" -> "Main"
-
-- disable "Show selected window"
+> [!TIP]
+>
+> The "Large Icons" task switcher has been modified mirror the task switcher in macOS, see: [ref](https://github.com/kdha200501/kdeplasma-addons)
 
 
 
@@ -1806,6 +1799,8 @@ https://github.com/kdha200501/aurorae
 https://github.com/kdha200501/kscreenlocker
 
 https://github.com/kdha200501/kwin
+
+https://github.com/kdha200501/kdeplasma-addons
 
 https://github.com/kdha200501/plasma-workspace
 
