@@ -1781,12 +1781,7 @@ $ rm -rf Maia_Transparent_Bak/
 
 # Modify `KDE`
 
-```shell
-$ mkdir -p path/to/project/collection/directory
-$ cd path/to/project/collection/directory
-```
-
-`git clone` these forks:
+KDE customizations are spread across these forks
 
 https://github.com/kdha200501/libinput
 
@@ -1809,14 +1804,47 @@ https://github.com/kdha200501/plasma-desktop
 https://github.com/kdha200501/plasma-login-manager
 
 
-
-Download and run the [build script](build.sh) to generate an installer
 > [!TIP]
 >
-> Use this command to install from the bundle
+> Download and run the [build script](build.sh) to clone and generate installer files
 >
 > ```shell
->$ sudo tar xzf path/to/project/collection/directory/dist.tar.gz -C /
+> $ mkdir -p /path/to/build/projects/directory
+> $ cd /path/to/build/projects/directory
+> 
+> $ wget https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/build.sh
+> $ chmod +x build.sh
+> 
+> $ ./build.sh -C .
+> 
+> # install from tar file
+> $ sudo tar -xf /path/to/output.tar -C /
+> 
+> # install from rpm file
+> $ sudo rpm reinstall /path/to/output.rpm
+> ```
+
+
+
+> [!TIP]
+>
+> Download [checkout script](checkout.sh) and [agent skill](SKILL.md), use them to create new build source when Fedora packages are updated
+>
+> ```shell
+> $ wget https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/SKILL.md
+> $ wget https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/checkout.sh
+> $ chmod +x checkout.sh
+> 
+> $ mkdir -p ~/.claude/skills/fedora-update
+> $ mv SKILL.md checkout.sh ~/.claude/skills/fedora-update/
+> 
+> $ mkdir -p ~/.copilot/skills
+> $ ln -s ~/.claude/skills/fedora-update ~/.copilot/skills/fedora-update
+> 
+> $ mkdir -p /path/to/edit/projects/directory
+> $ cd /path/to/edit/projects/directory
+> 
+> # prompt a coding agent to, for example, "update Fedora package forks"
 > ```
 
 
