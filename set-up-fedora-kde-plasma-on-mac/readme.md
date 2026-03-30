@@ -1833,6 +1833,18 @@ Download and run the [build script](build.sh) to generate an installer
 
 
 
+Download [checkout script](checkout.sh) and [agent skill](SKILL.md), use them to create new build source when Fedora packages are updated
+
+```shell
+$ mkdir -p ~/.claude/skills/fedora-update
+$ cp SKILL.md checkout.sh ~/.claude/skills/fedora-update/
+
+$ mkdir -p ~/.copilot/skills
+$ ln -s ~/.claude/skills/fedora-update ~/.copilot/skills/fedora-update
+```
+
+
+
 
 
 
