@@ -776,6 +776,20 @@ $ bash pisugar-power-manager.sh -c release
 
 
 
+Unfortunately, the latest version of `pisugar-server` handles websocket in a way that is incompatible with Nginx. Reverting to a known working version like [v2.0.0](https://github.com/PiSugar/pisugar-power-manager-rs/releases/tag/v2.0.0)
+
+```shell
+$ sudo systemctl stop pisugar-server
+$ sudo apt-get purge pisugar-server
+$ sudo killall pisugar-server 2>/dev/null
+
+$ wget https://github.com/PiSugar/pisugar-power-manager-rs/releases/download/v2.0.0/pisugar-server_2.0.0-1_arm64.deb
+$ sudo dpkg -i pisugar-server_2.0.0-1_arm64.deb
+$ sudo reboot
+```
+
+
+
 A HTTP server is launched immediately after the installation and it is automatically scheduled to launch when the Raspberry Pi starts up.
 
 > [!TIP]
@@ -790,6 +804,7 @@ A HTTP server is launched immediately after the installation and it is automatic
 >
 > - `/usr/bin/pisugar-server` is the HTTP server binary
 > - `/usr/share/pisugar-server/web` is the asset folder for the web application
+> - `config.json` is where the result of battery calibration is stored
 > - port `8421` serves the assets for the web application
 > - port `8422` broadcasts the real-time batter information
 
@@ -837,6 +852,13 @@ Append to the end of the `server` block:
 ```nginx
     # UPS Web UI paths
     include sites-available/ups-webui/locations.conf;
+
+    # Global shadow
+    location /static/ {
+        if ($http_referer ~* /sso/ups/) {
+            rewrite ^/static/(.*)$ /sso/ups/static/$1 redirect;
+        }
+    }
 ```
 
 
@@ -851,7 +873,7 @@ $ nginxStop
 Unfortunately, the web application does not respect the "X-Ingress-Path" header. The base path needs to be fixed at the JavaScript
 
 ```shell
-$ sudo vim /usr/share/pisugar-server/web/web.<hash>.js
+$ sudo vim /usr/share/pisugar-server/web/static/js/app.<hash>.js
 ```
 
 Replace
@@ -881,38 +903,22 @@ Note: the wss call failure will be fixed later when we setup SSO
 
 ##### Block external HTTP requests to the UPS server
 
-This forces access to the web application to come through the HTTPS reverse proxy
-
 ```shell
-$ sudo iptables -A INPUT -p tcp -s localhost --dport 8421 -j ACCEPT
-$ sudo iptables -A INPUT -p tcp -s localhost --dport 8422 -j ACCEPT
-$ sudo iptables -A INPUT -p tcp --dport 8421 -j DROP
-$ sudo iptables -A INPUT -p tcp --dport 8422 -j DROP
+$ sudo vim /etc/default/pisugar-server
 ```
 
 
 
-Verify
-
-```shell
-$ sudo iptables -L -v -n --line-numbers
-```
+Replace
 
 ```
-Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
-num   pkts bytes target     prot opt in     out     source               destination         
-1        0     0 ACCEPT     6    --  *      *       127.0.0.1            0.0.0.0/0            tcp dpt:8421
-2        0     0 ACCEPT     6    --  *      *       127.0.0.1            0.0.0.0/0            tcp dpt:8422
-3       33  1980 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:8421
-4        0     0 DROP       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:8422
+--http 0.0.0.0:8421 --ws 0.0.0.0:8422  --tcp 0.0.0.0:8423
 ```
 
+with
 
-
-Sometimes, the same rule is repeated, to remove a redundant rule
-
-```shell
-$ sudo iptables -D INPUT <num>
+```
+--http 127.0.0.1:8421 --ws 127.0.0.1:8422  --tcp 127.0.0.1:8423
 ```
 
 
