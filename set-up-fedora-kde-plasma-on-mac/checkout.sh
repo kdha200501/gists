@@ -2,12 +2,13 @@
 
 # Parse command-line options
 projects_dir=""
+fedora_version=""
 
-while getopts "hC:" opt; do
+while getopts "hC:f:" opt; do
   case $opt in
     h)
       cat <<EOF
-Usage: $(basename "$0") -C <projects_dir>
+Usage: $(basename "$0") -C <projects_dir> [-f <fedora_version>]
 
 A script to branching off Fedora packages' upstream tags corresponding to their
 latest version on dnf.
@@ -15,6 +16,7 @@ latest version on dnf.
 Options:
   -h    Show this help message and exit
   -C    Path to the directory where project repositories will be cloned
+  -f    Fedora version to target (defaults to the host's current version: $(rpm -E %fedora))
 
 Description:
   This script clones package forks from GitHub, fetches upstream tags, creates
@@ -42,6 +44,13 @@ EOF
         exit 1
       fi
       projects_dir="$OPTARG"
+      ;;
+    f)
+      if [[ -z "$OPTARG" || "$OPTARG" == -* ]]; then
+        echo "❌ Invalid Fedora version." >&2
+        exit 1
+      fi
+      fedora_version="$OPTARG"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -179,11 +188,8 @@ mark_build_branch() {
   # Get the root commit on the origin master branch
   ROOT_COMMIT=$(git -C "$project_dir" rev-list --max-parents=0 origin/master 2>/dev/null)
 
-  # Reset local git note to remote
-  git -C "$project_dir" fetch origin "refs/notes/f$FEDORA_VERSION:refs/notes/f$FEDORA_VERSION" --quiet &>/dev/null || {
-    echo "Error: failed to fetch git note from origin for $project" >&2
-    return 1
-  }
+  # Reset local git note to remote (may not exist yet for a new Fedora version)
+  git -C "$project_dir" fetch origin "refs/notes/f$FEDORA_VERSION:refs/notes/f$FEDORA_VERSION" --quiet &>/dev/null
 
   EXISTING_NOTE=$(git -C "$project_dir" notes --ref "f$FEDORA_VERSION" show "$ROOT_COMMIT" 2>/dev/null)
 
@@ -418,7 +424,12 @@ PACKAGE_JSON=$(cat <<"EOF"
 EOF
 )
 
-FEDORA_VERSION=$(rpm -E %fedora)
+
+# Vet the Fedora version option
+dnf --releasever="$fedora_version" repoquery --repo=fedora --latest-limit=1 fedora-release &>/dev/null
+[[ $? -ne 0 ]] && { echo "❌ Fedora version $fedora_version is not available in dnf" >&2; exit 1; }
+FEDORA_VERSION="${fedora_version}"
+
 for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
   package_fork=$(jq -r '.fork' <<< "$package")
   project=$(basename "$package_fork" .git)
