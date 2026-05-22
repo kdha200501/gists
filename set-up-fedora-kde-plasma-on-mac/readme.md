@@ -1815,6 +1815,9 @@ https://github.com/kdha200501/plasma-login-manager
 > $ wget https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/build.sh
 > $ chmod +x build.sh
 > 
+> # install dependencies
+> $ sudo dnf install git jq rpmdevtools
+> 
 > $ ./build.sh -C .
 > 
 > # install from tar file
@@ -1844,7 +1847,7 @@ https://github.com/kdha200501/plasma-login-manager
 > $ mkdir -p /path/to/edit/projects/directory
 > $ cd /path/to/edit/projects/directory
 > 
-> # prompt a coding agent to, for example, "update Fedora package forks"
+> # prompt a coding agent to, for example, "rebase KDE forks on top of Fedora"
 > ```
 
 
