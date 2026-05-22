@@ -20,7 +20,27 @@ kdeplasma-addons, plasma-workspace, plasma-desktop.
 
 ---
 
-## Step 1 — Run `checkout.sh`
+## Step 1 — Determine the target Fedora version
+
+Detect the host machine's current Fedora version:
+
+```bash
+rpm -E %fedora
+```
+
+Ask the user which Fedora version to target, presenting the detected version as
+the default:
+
+```bash
+read -p "Which Fedora version should I target? (default: $(rpm -E %fedora)): " fedora_version
+fedora_version="${fedora_version:-$(rpm -E %fedora)}"
+```
+
+Use the value of `fedora_version` for the rest of the skill.
+
+---
+
+## Step 2 — Run `checkout.sh`
 
 Locate `checkout.sh` in this skill's directory:
 
@@ -32,17 +52,18 @@ Locate `checkout.sh` in this skill's directory:
 
 Determine the **current working directory** at the time the prompt was received.
 
-Run the script, passing the current working directory with the `-C` option:
+Run the script, passing the current working directory with the `-C` option and
+the target Fedora version with the `-f` option:
 
 ```bash
-<path_to_checkout_sh> -C <current_working_directory>
+<path_to_checkout_sh> -C <current_working_directory> -f <fedora_version>
 ```
 
 Capture the **complete stdout output** of the script for use in the next step.
 
 ---
 
-## Step 2 — Parse the script output
+## Step 3 — Parse the script output
 
 Scan the captured output for forks that require cherry-picking. The output is
 structured as one log block per fork:
@@ -78,7 +99,7 @@ For each such fork, extract:
 
 ---
 
-## Step 3 — Ask for confirmation
+## Step 4 — Ask for confirmation
 
 Present the parsed results to the user:
 
@@ -93,7 +114,7 @@ Stop if the user does not confirm.
 
 ---
 
-## Step 4 — Spawn one sub-agent per fork
+## Step 5 — Spawn one sub-agent per fork
 
 For **each** fork that requires cherry-picking, **spawn a separate sub-agent**,
 providing it with the per-fork context and the sub-agent instructions below.
@@ -189,7 +210,7 @@ Commits to cherry-pick (oldest-first after reversing the list):
 
 ---
 
-## Step 5 — Summarize results
+## Step 6 — Summarize results
 
 After all sub-agents complete, present a summary to the user:
 
