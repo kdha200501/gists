@@ -327,35 +327,6 @@ $ docker exec ollama-rocm ollama ps
 
 
 
-# Connect `Continue` coding agent to Ollama
-
-```shell
-$ touch "$HOME/.continue/config.yaml"
-$ atom "$HOME/.continue/config.yaml"
-```
-
-Copy and paste:
-
-```yaml
-name: Local Agent
-version: 1.0.0
-schema: v1
-models:
-  - name: Qwen3 Coder 30b
-    provider: ollama
-    model: qwen3-coder:30b
-    apiBase: http://<ip-address>:11434
-    roles:
-      - chat
-      - edit
-      - apply
-      - autocomplete
-```
-
-
-
-
-
 # Connect `Claude Code CLI` coding agent to Ollama
 
 The Ollama API is now compatible with OpenAI and Anthropic clients
