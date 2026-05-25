@@ -1,81 +1,7 @@
-# Ubuntu and kernel versions
+# Prerequisites
 
-##### kernel
+See [prerequisites.md](prerequisites.md) for Ubuntu/kernel version checks, disk space verification, and `amdgpu`/`rocm` driver installation.
 
-```shell
-$ uname -r
-```
-
-Example output:
-
-```
-6.8.0-85-generic
-```
-
-##### OS
-
-```shell
-$ lsb_release -a
-```
-
-Example output:
-
-```
-No LSB modules are available.
-Distributor ID: Ubuntu
-Description:    Ubuntu 24.04.3 LTS
-Release:        24.04
-Codename:       noble
-```
-
-> [!NOTE]
->
-> `rocm` supports `6.8 [GA], 6.14 [HWE]` at `Ubuntu 24.04.3`
-
-
-
-
-
-# Verify disk space
-
-```shell
-$ df -h
-$ sudo vgdisplay
-```
-
-> [!WARNING]
->
-> Ubuntu does not necessarily use all the available disk space
-
-
-
-##### Claim unused disk space (if any)
-
-```shell
-$ sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
-$ sudo resize2fs /dev/ubuntu-vg/ubuntu-lv
-```
-
-
-
-
-
-# Install `amdgpu` driver and the `rocm` backend
-
-```shell
-$ wget https://repo.radeon.com/amdgpu-install/7.0.2/ubuntu/noble/amdgpu-install_7.0.2.70002-1_all.deb
-$ sudo apt install ./amdgpu-install_7.0.2.70002-1_all.deb
-$ sudo apt update
-
-$ sudo apt install "linux-headers-$(uname -r)" "linux-modules-extra-$(uname -r)"
-$ sudo apt install amdgpu-dkms
-
-$ sudo apt install python3-setuptools python3-wheel
-$ sudo usermod -a -G render,video $LOGNAME
-$ sudo apt install rocm
-
-$ sudo reboot
-```
 
 
 
@@ -103,7 +29,7 @@ $ newgrp docker
 
 # Run Ollama server from docker compose
 
-##### Pull Ollama docker image specifically for `rocm`
+##### Pull *Ollama* docker image specifically for `rocm`
 
 ```shell
 $ nohup docker pull ollama/ollama:rocm > $HOME/pull_ollama_log.txt 2>&1 &
@@ -128,7 +54,7 @@ $ nohup docker pull ollama/ollama:rocm > $HOME/pull_ollama_log.txt 2>&1 &
 
 
 
-##### Pull docker image for an Ollama Webapp
+##### Pull docker image for an Chat Webapp
 
 ```shell
 $ nohup docker pull ghcr.io/open-webui/open-webui:main > $HOME/pull_open_webui_log.txt 2>&1 &
@@ -244,7 +170,7 @@ EOF
 
 
 
-##### Create a service for the Ollama server
+##### Create a service for the *Ollama* server
 
 ```shell
 $ sudo touch /etc/systemd/system/ollama.service
@@ -281,19 +207,29 @@ $ docker ps
 
 ##### Pull LLMs
 
+Some *Ollama* models work with *Claude Code* right out-of-box because their contributors made the effort to calibrate the templates for *thinking* and local tool calling.
+
+
+
+The *Qwopus* family of models distil *thinking* from an *Opus* model and apply to a *Qwen* model. The `gag0/qwen35-opus-distil:27b` model is simply outstanding in *thinking* and local tool calling.
+
 ```shell
-$ nohup docker exec ollama-rocm ollama pull qwen3-coder:30b > $HOME/qwen_pull.log 2>&1 &
-$ nohup docker exec ollama-rocm ollama pull gemma3:27b > $HOME/gemma_pull.log 2>&1 &
+ $ nohup docker exec ollama-rocm ollama pull gag0/qwen35-opus-distil:27b > ollama_hf_pull.log 2>&1 &
+```
+
+
+
+The `glm-4.7-flash` is also great at local tool calling
+
+```shell
 $ nohup docker exec ollama-rocm ollama pull glm-4.7-flash > $HOME/glm_pull.log 2>&1 &
 ```
 
 > [!TIP]
 >
-> The `qwen3-coder` variants are compatible with tool calling
->
-> The `gemma3` LLM is multi modal
->
 > See available models at https://ollama.com/library
+>
+> For pulling LLM from hugging face, see the [unsloth/qwen3.6:27bn.md](unsloth-qwen3.6:27bn.md) example
 
 
 
@@ -325,57 +261,6 @@ $ docker exec ollama-rocm ollama ps
 
 
 
+# Connect Coding Agents to Ollama
 
-
-# Connect `Claude Code CLI` coding agent to Ollama
-
-The Ollama API is now compatible with OpenAI and Anthropic clients
-
-##### Installation
-
-```shell
-$ curl -fsSL https://claude.ai/install.sh | bash
-```
-
-> [!TIP]
->
-> The cli is installed at `~/.local/bin/claude `
-
-
-
-##### Configuration
-
-```shell
-$ vim ~/.bashrc
-```
-
-Copy and paste:
-
-```shell
-export ANTHROPIC_BASE_URL="http://<ip-address>:11434"
-export ANTHROPIC_API_KEY="" # Required but ignored by Ollama
-export ANTHROPIC_AUTH_TOKEN="ollama"
-export EDITOR=vim
-```
-
-
-
-```shell
-$ vim ~/.config/git/ignore
-```
-
-Add:
-
-```
-**/.claude/settings.local.json
-**/.mcp.json
-```
-
-
-
-##### Launch
-
-```shell
-$ claude --model qwen3-coder:30b
-```
-
+See [coding-agent.md](coding-agent.md) for installing and configuring Claude Code CLI and Opencode.
