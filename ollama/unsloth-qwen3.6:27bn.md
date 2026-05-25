@@ -39,20 +39,17 @@ FROM /root/.ollama/models/blobs/unsloth-qwen3_6_27bn.gguf
 
 # 2. Correct Agent Parameters
 PARAMETER num_ctx 32768
-PARAMETER temperature 0.5
-PARAMETER top_p 0.9
+PARAMETER temperature 0.2
+PARAMETER top_p 0.95
+PARAMETER repeat_penalty 1.1
 
-# Crucial: DO NOT add <tool_call> or <tool_use> as stop tokens! 
-# If you stop on them, the agent never gets the arguments it needs to execute.
+# Ensure we don't stop prematurely
 PARAMETER stop "<|im_start|>"
 PARAMETER stop "<|im_end|>"
+PARAMETER stop "<|endoftext|>"
 
-# 3. Complete Loop Template
-TEMPLATE """{{- if .Messages }}
-{{- if or .System .Tools }}<|im_start|>system
-{{- if .System }}
+TEMPLATE """{{- if .System }}<|im_start|>system
 {{ .System }}
-{{- end }}
 {{- if .Tools }}
 
 # Tools
@@ -69,31 +66,21 @@ For each function call, return a JSON object with function name and arguments wi
 </tool_call>
 {{- end }}<|im_end|>
 {{- end }}
-{{- range $i, $_ := .Messages }}
-{{- $last := eq (len (slice $.Messages $i)) 1 -}}
+{{- range .Messages }}
 {{- if eq .Role "user" }}<|im_start|>user
 {{ .Content }}<|im_end|>
 {{- else if eq .Role "assistant" }}<|im_start|>assistant
 {{- if .Content }}{{ .Content }}{{- end }}
 {{- if .ToolCalls }}<tool_call>
 {{- range .ToolCalls }}{"name": "{{ .Function.Name }}", "arguments": {{ .Function.Arguments }}}{{- end }}
-</tool_call>{{- end }}{{ if not $last }}<|im_end|>{{ end }}
+</tool_call>{{- end }}<|im_end|>
 {{- else if eq .Role "tool" }}<|im_start|>user
 <tool_response>
 {{ .Content }}
 </tool_response><|im_end|>
 {{- end }}
-{{- if and (ne .Role "assistant") $last }}<|im_start|>assistant
-{{- end }}
-{{- end }}
-{{- else }}
-{{- if .System }}<|im_start|>system
-{{ .System }}<|im_end|>
-{{- end }}
-{{- if .Prompt }}<|im_start|>user
-{{ .Prompt }}<|im_end|>
 {{- end }}<|im_start|>assistant
-{{- end }}{{ .Response }}{{ if .Response }}<|im_end|>{{ end }}"""
+"""
 ```
 
 
