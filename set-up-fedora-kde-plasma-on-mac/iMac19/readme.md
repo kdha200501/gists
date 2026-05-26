@@ -40,11 +40,7 @@ sudo modprobe hci_bcm4377
 
 # Install sound card driver
 
-There are drivers for the CS8409 sound chip and none has made it to the Linux kernel. Compile and install the `snd_hda_macbookpro` driver.
-
-> [!TIP]
->
-> repeat for every kernel update
+There are drivers for the CS8409 sound chip and none has made it to the Linux kernel.
 
 > [!WARNING]
 >
@@ -54,27 +50,32 @@ There are drivers for the CS8409 sound chip and none has made it to the Linux ke
 
 
 
-##### Install dependencies for `snd_hda_macbookpro`
+##### Compile and install `kdha200501/imac-cs8409-audio-driver`
 
-```shell
-$ dnf install gcc kernel-devel make patch wget
-```
+The driver needs to be compiled and installed for every kernel update.
 
+Instructions: [link](https://github.com/kdha200501/imac-cs8409-audio-driver)
 
-
-
-
-##### Compile and install  `snd_hda_macbookpro`
-
-ref: [link](https://github.com/davidjo/snd_hda_macbookpro?tab=readme-ov-file#compiling-and-installing-driver)
-
-```shell
-$ cd ~/Downloads
-$ git clone https://github.com/davidjo/snd_hda_macbookpro.git
-$ cd ~/Downloads/snd_hda_macbookpro
-$ sudo ./install.cirrus.driver.sh
-$ sudo reboot
-```
+> [!TIP]
+>
+> Download [checkout script](checkout.sh) and [agent skill](SKILL.md), use them to create new build source when the Linux kernel is updated through Fedora updates
+>
+> ```shell
+> $ wget https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/iMac19/SKILL.md
+> $ wget https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/iMac19/checkout.sh
+> $ chmod +x checkout.sh
+> 
+> $ mkdir -p ~/.claude/skills/imac-driver-update
+> $ mv SKILL.md checkout.sh ~/.claude/skills/imac-driver-update/
+> 
+> $ mkdir -p ~/.copilot/skills
+> $ ln -s ~/.claude/skills/imac-driver-update ~/.copilot/skills/imac-driver-update
+> 
+> $ mkdir -p /path/to/edit/projects/directory
+> $ cd /path/to/edit/projects/directory
+> 
+> # prompt a coding agent to, for example, "rebase iMac driver forks on top of Fedora"
+> ```
 
 
 
