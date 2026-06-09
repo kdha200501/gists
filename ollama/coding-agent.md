@@ -69,7 +69,7 @@ $ touch ~/.config/opencode/opencode.json
 $ vim ~/.config/opencode/opencode.json
 ```
 
-Copy + paste
+Copy and paste
 
 ```json
 {
