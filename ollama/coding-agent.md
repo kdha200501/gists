@@ -17,7 +17,7 @@ $ curl -fsSL https://claude.ai/install.sh | bash
 ##### Configuration
 
 ```shell
-$ vim ~/.bashrc
+$ atom ~/.bashrc
 ```
 
 Copy and paste:
@@ -32,10 +32,10 @@ export EDITOR=vim
 
 
 ```shell
-$ vim ~/.config/git/ignore
+$ atom ~/.config/git/ignore
 ```
 
-Add:
+Copy and paste:
 
 ```
 **/.claude/settings.local.json
@@ -62,14 +62,16 @@ $ claude --model qwen3-coder:30b
 $ curl -fsSL https://opencode.ai/install | bash
 ```
 
+
+
 ##### Configuration
 
 ```shell
 $ touch ~/.config/opencode/opencode.json
-$ vim ~/.config/opencode/opencode.json
+$ atom ~/.config/opencode/opencode.json
 ```
 
-Copy + paste
+Copy and paste:
 
 ```json
 {
@@ -88,4 +90,17 @@ Copy + paste
     }
   }
 }
+```
+
+
+
+```shell
+$ atom ~/.config/git/ignore
+```
+
+Copy and paste:
+
+```
+**/.claude/settings.local.json
+**/opencode.jsonc
 ```
