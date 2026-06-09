@@ -31,7 +31,7 @@ $ sudo touch /opt/ollama/llm-cache/Modelfile
 $ sudo vim /opt/ollama/llm-cache/Modelfile
 ```
 
-Copy + paste
+Copy and paste
 
 ```
 # 1. Point to your locally downloaded GGUF file
