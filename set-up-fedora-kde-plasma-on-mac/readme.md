@@ -1780,6 +1780,8 @@ https://github.com/kdha200501/plasma-workspace
 
 https://github.com/kdha200501/plasma-desktop
 
+https://github.com/kdha200501/plasma-milou
+
 https://github.com/kdha200501/plasma-login-manager
 
 
