@@ -26,7 +26,7 @@ Description:
 
   Supported packages:
     - libinput
-    - kf6-kio
+    - kio (kf6-kio)
     - dolphin
     - aurorae
     - kscreenlocker
@@ -34,6 +34,7 @@ Description:
     - kdeplasma-addons
     - plasma-workspace
     - plasma-desktop
+    - milou (plasma-milou)
     - plasma-login-manager
 EOF
       exit 0
@@ -362,7 +363,7 @@ set_fork_version() {
 
       return 0
       ;;
-    aurorae|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker)
+    aurorae|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou)
       local tag="v$package_latest_version"
       git -C "$project_dir" fetch --no-tags upstream "refs/tags/$tag:refs/upstream/$tag" &>/dev/null || {
         echo "Error: unable to fetch tag $tag from upstream for $project" >&2
@@ -427,6 +428,7 @@ PACKAGE_JSON=$(cat <<"EOF"
   { "name": "kdeplasma-addons",     "fork": "git@github.com:kdha200501/kdeplasma-addons.git",     "upstream": "https://github.com/KDE/kdeplasma-addons.git" },
   { "name": "plasma-workspace",     "fork": "git@github.com:kdha200501/plasma-workspace.git",     "upstream": "https://github.com/KDE/plasma-workspace.git" },
   { "name": "plasma-desktop",       "fork": "git@github.com:kdha200501/plasma-desktop.git",       "upstream": "https://github.com/KDE/plasma-desktop.git" },
+  { "name": "plasma-milou",         "fork": "git@github.com:kdha200501/milou.git",                "upstream": "https://github.com/KDE/milou.git" },
   { "name": "plasma-login-manager", "fork": "git@github.com:kdha200501/plasma-login-manager.git", "upstream": "https://src.fedoraproject.org/rpms/plasma-login-manager.git" }
 ]
 EOF
