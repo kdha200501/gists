@@ -24,8 +24,8 @@ Options:
   -C, --cwd PATH      Specify the projects' parent directory (default: current directory)
 
 Forked repositories:
-  libinput, kf6-kio, dolphin, aurorae, kscreenlocker, kwin, kdeplasma-addons,
-  plasma-workspace, plasma-desktop, plasma-login-manager
+  libinput, kio (kf6-kio), dolphin, aurorae, kscreenlocker, kwin, kdeplasma-addons,
+   plasma-workspace, plasma-desktop, plasma-login-manager, milou (plasma-milou)
 
 Examples:
   $0 -l                            # List all forked repositories
@@ -220,7 +220,8 @@ PACKAGE_JSON=$(cat <<"EOF"
   { "name": "kwin",                 "fork": "https://github.com/kdha200501/kwin.git",                 "type": "tarball" },
   { "name": "kdeplasma-addons",     "fork": "https://github.com/kdha200501/kdeplasma-addons.git",     "type": "tarball" },
   { "name": "plasma-workspace",     "fork": "https://github.com/kdha200501/plasma-workspace.git",     "type": "tarball" },
-  { "name": "plasma-desktop",       "fork": "https://github.com/kdha200501/plasma-desktop.git",       "type": "tarball" }
+  { "name": "plasma-desktop",       "fork": "https://github.com/kdha200501/plasma-desktop.git",       "type": "tarball" },
+  { "name": "plasma-milou",         "fork": "https://github.com/kdha200501/milou.git",                "type": "tarball" }
 ]
 EOF
 )
@@ -375,7 +376,7 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
           }
         }
         ;;
-      aurorae|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker)
+      aurorae|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou)
         sudo dnf --refresh builddep -y "$package_name" >>"$log_file" 2>&1 || {
           echo "❌ dnf builddep error, see log at $log_file" >>"$log_file" 2>&1
           exit 1
