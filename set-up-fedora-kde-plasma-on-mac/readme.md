@@ -1478,11 +1478,12 @@ Go to "System Settings" -> "Colors & Themes" -> "Jacks-KDE-Icon-Pack"
 
 ##### Install cursor icons
 
-Under "System Settings" -> "Colors & Themes" -> "Cursor" -> "Get New"
+```shell
+$ cd ~/.icons
+$ git clone https://github.com:kdha200501/jacks-kde-pointer-pack.git
+```
 
-For example, switching to Mac OS cursor icons:
-
-- search for "Mac OS by dcppdp"
+Under "System Settings" -> "Colors & Themes" -> "Pointers"
 
 Under "System Settings" -> "Colors & Themes" -> "Login Screen" -> "Apply Plasma Settings"
 
