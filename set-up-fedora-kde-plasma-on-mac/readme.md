@@ -191,6 +191,26 @@ Comment=Command line access
 
 
 
+##### *Signal*
+
+```shell
+$ touch ~/.local/share/applications/signal.desktop
+$ vim ~/.local/share/applications/signal.desktop
+```
+
+Copy and paste:
+
+```shell
+[Desktop Entry]
+Name=Signal
+Exec=/path/to/Signal.AppImage
+Icon=/home/jacks/Pictures/icons/signal.svg
+Type=Application
+Categories=Network;InstantMessaging;
+```
+
+
+
 
 
 
@@ -2047,10 +2067,7 @@ Download and install from official website, ref: [link](https://zoom.us/download
 
 # Install *Signal*
 
-```shell
-$ sudo dnf config-manager addrepo --from-repofile=https://download.opensuse.org/repositories/network:/im:/signal/Fedora_$(rpm -E %fedora)/network:im:signal.repo
-$ sudo dnf install signal-desktop
-```
+Follow [instructions](https://signal.org/download/) to download and install AppImage
 
 
 
