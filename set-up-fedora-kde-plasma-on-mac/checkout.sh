@@ -29,6 +29,7 @@ Description:
     - kio (kf6-kio)
     - dolphin
     - aurorae
+    - breeze (breeze-gtk)
     - kscreenlocker
     - kwin
     - kdeplasma-addons
@@ -363,7 +364,7 @@ set_fork_version() {
 
       return 0
       ;;
-    aurorae|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou)
+    aurorae|breeze|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou)
       local tag="v$package_latest_version"
       git -C "$project_dir" fetch --no-tags upstream "refs/tags/$tag:refs/upstream/$tag" &>/dev/null || {
         echo "Error: unable to fetch tag $tag from upstream for $project" >&2
@@ -423,6 +424,7 @@ PACKAGE_JSON=$(cat <<"EOF"
   { "name": "kf6-kio",              "fork": "git@github.com:kdha200501/kio.git",                  "upstream": "https://github.com/KDE/kio.git" },
   { "name": "dolphin",              "fork": "git@github.com:kdha200501/dolphin.git",              "upstream": "https://github.com/KDE/dolphin.git" },
   { "name": "aurorae",              "fork": "git@github.com:kdha200501/aurorae.git",              "upstream": "https://github.com/KDE/aurorae.git" },
+  { "name": "breeze-gtk",           "fork": "git@github.com:kdha200501/breeze.git",               "upstream": "https://github.com/KDE/breeze.git" },
   { "name": "kscreenlocker",        "fork": "git@github.com:kdha200501/kscreenlocker.git",        "upstream": "https://github.com/KDE/kscreenlocker.git" },
   { "name": "kwin",                 "fork": "git@github.com:kdha200501/kwin.git",                 "upstream": "https://github.com/KDE/kwin.git" },
   { "name": "kdeplasma-addons",     "fork": "git@github.com:kdha200501/kdeplasma-addons.git",     "upstream": "https://github.com/KDE/kdeplasma-addons.git" },
