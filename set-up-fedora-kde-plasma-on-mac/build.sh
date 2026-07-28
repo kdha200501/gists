@@ -24,8 +24,8 @@ Options:
   -C, --cwd PATH      Specify the projects' parent directory (default: current directory)
 
 Forked repositories:
-  libinput, kio (kf6-kio), dolphin, aurorae, kscreenlocker, kwin, kdeplasma-addons,
-   plasma-workspace, plasma-desktop, plasma-login-manager, milou (plasma-milou)
+  libinput, kio (kf6-kio), dolphin, aurorae, breeze (breeze-gtk), kscreenlocker, kwin,
+  kdeplasma-addons, plasma-workspace, plasma-desktop, plasma-login-manager, milou (plasma-milou)
 
 Examples:
   $0 -l                            # List all forked repositories
@@ -216,6 +216,7 @@ PACKAGE_JSON=$(cat <<"EOF"
   { "name": "kf6-kio",              "fork": "https://github.com/kdha200501/kio.git",                  "type": "tarball" },
   { "name": "dolphin",              "fork": "https://github.com/kdha200501/dolphin.git",              "type": "tarball" },
   { "name": "aurorae",              "fork": "https://github.com/kdha200501/aurorae.git",              "type": "tarball" },
+  { "name": "breeze-gtk",           "fork": "https://github.com/kdha200501/breeze.git",               "type": "tarball" },
   { "name": "kscreenlocker",        "fork": "https://github.com/kdha200501/kscreenlocker.git",        "type": "tarball" },
   { "name": "kwin",                 "fork": "https://github.com/kdha200501/kwin.git",                 "type": "tarball" },
   { "name": "kdeplasma-addons",     "fork": "https://github.com/kdha200501/kdeplasma-addons.git",     "type": "tarball" },
@@ -376,13 +377,13 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
           }
         }
         ;;
-      aurorae|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou)
+      aurorae|breeze|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou)
         sudo dnf --refresh builddep -y "$package_name" >>"$log_file" 2>&1 || {
           echo "❌ dnf builddep error, see log at $log_file" >>"$log_file" 2>&1
           exit 1
         }
 
-        cmake -B "$project_dir/build/" -S "$project_dir/" -DCMAKE_INSTALL_PREFIX="/usr" -DCMAKE_BUILD_TYPE="Release" -DBUILD_TESTING=OFF -DKDE_INSTALL_USE_QT_SYS_PATHS=ON -DCMAKE_INSTALL_LIBDIR=lib64 -DQT_MAJOR_VERSION=6 -DKDE_INSTALL_SYSCONFDIR=/etc -DKDE_INSTALL_LOCALSTATEDIR=/var -DKDE_INSTALL_LIBEXECDIR=libexec -DPAM_OS_CONFIGURATION="fedora" >>"$log_file" 2>&1 || {
+        cmake -B "$project_dir/build/" -S "$project_dir/" -DCMAKE_INSTALL_PREFIX="/usr" -DCMAKE_BUILD_TYPE="Release" -DBUILD_TESTING=OFF -DKDE_INSTALL_USE_QT_SYS_PATHS=ON -DCMAKE_INSTALL_LIBDIR=lib64 -DQT_MAJOR_VERSION=6 -DKDE_INSTALL_SYSCONFDIR=/etc -DKDE_INSTALL_LOCALSTATEDIR=/var -DKDE_INSTALL_LIBEXECDIR=libexec -DBUILD_QT5=OFF -DPAM_OS_CONFIGURATION="fedora" >>"$log_file" 2>&1 || {
           echo "❌ cmake error, see log at $log_file" >>"$log_file" 2>&1
           exit 1
         }
