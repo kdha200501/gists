@@ -1739,13 +1739,33 @@ Go to "System Settings" -> "Colors and Themes" -> "Application Style" -> "kvantu
 $ atom ~/.config/Kvantum/Mac9KvantumClassic/Mac9KvantumClassic.kvconfig
 ```
 
-Modify these lines
-
 ```diff
--inactive.highlight.text.color=black
-+inactive.highlight.text.color=white
-
-[Menu]
+diff --git a/Mac9KvantumClassic.kvconfig b/Mac9KvantumClassic.kvconfig
+index 7397d11..385c157 100644
+--- a/Mac9KvantumClassic.kvconfig
++++ b/Mac9KvantumClassic.kvconfig
+@@ -47,7 +47,7 @@ large_icon_size=32
+ layout_margin=4
+ layout_spacing=4
+ merge_menubar_with_toolbar=false
+-respect_DE=true
++respect_DE=false
+ scroll_arrows=true
+ scrollbar_in_view=false
+ transient_scrollbar=false
+@@ -96,7 +96,7 @@ inactive.window.text.color=black
+ button.text.color=black
+ disabled.text.color=#00000070
+ tooltip.text.color=black
+-highlight.text.color=black
++highlight.text.color=white
+ inactive.highlight.text.color=black
+ highlight.color=#a6a8c1
+ link.color=#0000ff
+@@ -379,16 +379,18 @@ interior.element=iview
+ frame.element=iview
+ 
+ [Menu]
 +inherits=PanelButtonCommand
  frame.top=0
  frame.bottom=0
@@ -1753,17 +1773,34 @@ Modify these lines
 -frame.right=0
 +frame.left=4
 +frame.right=4
+ interior.element=mnu
  frame.element=mnu
-
+ frame=true
+ interior=true
+ 
  [MenuItem]
 +inherits=PanelButtonCommand
- text.normal.color=black
+ interior=true
+ interior.element=menuitem
+ frame.expansion=0
+@@ -400,6 +402,8 @@ text.normal.color=black
  text.focus.color=white
  text.margin.top=2
  text.margin.bottom=2
 +text.margin.left=12
 +text.margin.right=5
+ 
+ [MenuBarItem]
+ interior=true
+
 ```
+
+> [!NOTE]
+>
+> - `respect_DE=false` — disables DE-respecting mode so Kvantum applies the theme's own colors instead of KDE's system colors
+> - `highlight.text.color=white` — fixes unselected text that was unreadable against the highlight background
+> - `[Menu] inherits=PanelButtonCommand` and frame padding of 4px on each side — gives menus proper spacing
+> - `[MenuItem] inherits=PanelButtonCommand` with horizontal text margins (left 12px, right 5px) — aligns menu item text for a more authentic Mac OS 9 look
 
 
 
@@ -1847,6 +1884,8 @@ https://github.com/kdha200501/kio
 https://github.com/kdha200501/dolphin
 
 https://github.com/kdha200501/aurorae
+
+https://github.com/kdha200501/breeze
 
 https://github.com/kdha200501/kscreenlocker
 
