@@ -1848,6 +1848,8 @@ https://github.com/kdha200501/dolphin
 
 https://github.com/kdha200501/aurorae
 
+https://github.com/kdha200501/breeze
+
 https://github.com/kdha200501/kscreenlocker
 
 https://github.com/kdha200501/kwin
