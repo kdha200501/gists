@@ -24,7 +24,7 @@ Options:
   -C, --cwd PATH      Specify the projects' parent directory (default: current directory)
 
 Forked repositories:
-  libinput, kio (kf6-kio), dolphin, aurorae, breeze (breeze-gtk), kscreenlocker, kwin,
+  libinput, shared-mime-info, kio (kf6-kio), dolphin, aurorae, breeze (breeze-gtk), kscreenlocker, kwin,
   kdeplasma-addons, plasma-workspace, plasma-desktop, plasma-login-manager, milou (plasma-milou)
 
 Examples:
@@ -213,6 +213,7 @@ PACKAGE_JSON=$(cat <<"EOF"
 [
   { "name": "plasma-login-manager", "fork": "https://github.com/kdha200501/plasma-login-manager.git", "type": "rpm" },
   { "name": "libinput",             "fork": "https://github.com/kdha200501/libinput.git",             "type": "tarball" },
+  { "name": "shared-mime-info",     "fork": "https://github.com/kdha200501/shared-mime-info.git",     "type": "tarball" },
   { "name": "kf6-kio",              "fork": "https://github.com/kdha200501/kio.git",                  "type": "tarball" },
   { "name": "dolphin",              "fork": "https://github.com/kdha200501/dolphin.git",              "type": "tarball" },
   { "name": "aurorae",              "fork": "https://github.com/kdha200501/aurorae.git",              "type": "tarball" },
@@ -358,6 +359,32 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
         }
 
         meson setup "$project_dir/build/" "$project_dir/" --prefix=/usr --buildtype=release -Dlibdir=lib64 -Dtests=false -Ddocumentation=false -Ddebug-gui=false >>"$log_file" 2>&1 || {
+          echo "❌ meson error, see log at $log_file" >>"$log_file" 2>&1
+          exit 1
+        }
+
+        perform_compile "$dry_run" && {
+          ninja -C "$project_dir/build/" -j"$(nproc)" >>"$log_file" 2>&1 || {
+            echo "❌ ninja error, see log at $log_file" >>"$log_file" 2>&1
+            exit 1
+          }
+        }
+
+        perform_install "$dry_run" && {
+          [ -d "$dist_dir" ] && sudo rm -rf "$dist_dir"
+          sudo env DESTDIR="$dist_dir/" ninja -C "$project_dir/build/" install >>"$log_file" 2>&1 || {
+            echo "❌ ninja install error, see log at $log_file" >>"$log_file" 2>&1
+            exit 1
+          }
+        }
+        ;;
+       shared-mime-info)
+        sudo dnf --refresh builddep -y "$package_name" >>"$log_file" 2>&1 || {
+          echo "❌ dnf builddep error, see log at $log_file" >>"$log_file" 2>&1
+          exit 1
+        }
+
+        meson setup "$project_dir/build/" "$project_dir/" --prefix=/usr -Dupdate-mimedb=true >>"$log_file" 2>&1 || {
           echo "❌ meson error, see log at $log_file" >>"$log_file" 2>&1
           exit 1
         }
