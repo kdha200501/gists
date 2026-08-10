@@ -26,6 +26,7 @@ Description:
 
   Supported packages:
     - libinput
+    - shared-mime-info
     - kio (kf6-kio)
     - dolphin
     - aurorae
@@ -364,6 +365,23 @@ set_fork_version() {
 
       return 0
       ;;
+    shared-mime-info)
+      local tag="$package_latest_version"
+      git -C "$project_dir" fetch --no-tags upstream "refs/tags/$tag:refs/upstream/$tag" &>/dev/null || {
+        echo "Error: unable to fetch tag $tag from upstream for $project" >&2
+        return 1
+      }
+
+      local branch="customize/v$tag"
+      local upstream_tag="refs/upstream/$tag"
+      branch_off_upstream_tag "$project_dir" "$branch" "$upstream_tag" || return 1
+      mark_build_branch "$project_dir" "$branch" "$fedora_version" || return 1
+
+      local tag_commit=$(git -C "$project_dir" rev-parse "${upstream_tag}^{}" 2>/dev/null)
+      display_cherry_pick_commits "$project_dir" "$branch" "$tag_commit" || return 1
+
+      return 0
+      ;;
     aurorae|breeze|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou)
       local tag="v$package_latest_version"
       git -C "$project_dir" fetch --no-tags upstream "refs/tags/$tag:refs/upstream/$tag" &>/dev/null || {
@@ -421,6 +439,7 @@ FEDORA_VERSION="$fedora_version_input"
 PACKAGE_JSON=$(cat <<"EOF"
 [
   { "name": "libinput",             "fork": "git@github.com:kdha200501/libinput.git",             "upstream": "https://gitlab.freedesktop.org/libinput/libinput.git" },
+  { "name": "shared-mime-info",     "fork": "git@github.com:kdha200501/shared-mime-info.git",     "upstream": "https://gitlab.freedesktop.org/xdg/shared-mime-info.git" },
   { "name": "kf6-kio",              "fork": "git@github.com:kdha200501/kio.git",                  "upstream": "https://github.com/KDE/kio.git" },
   { "name": "dolphin",              "fork": "git@github.com:kdha200501/dolphin.git",              "upstream": "https://github.com/KDE/dolphin.git" },
   { "name": "aurorae",              "fork": "git@github.com:kdha200501/aurorae.git",              "upstream": "https://github.com/KDE/aurorae.git" },

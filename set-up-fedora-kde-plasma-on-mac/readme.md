@@ -1467,16 +1467,6 @@ $ sudo reboot
 
 # Customize icons
 
-##### Add missing MIME type mapping
-
-Go to "System Settings" -> "File Associations" -> "Add"
-
-- Choose "text" for Group", type "typescript" for "Type name"
-
-
-
-
-
 ##### Install system icons
 
 For example, switching to some Mac OS 9 icons:
@@ -1878,6 +1868,8 @@ $ rm -rf Maia_Transparent_Bak/
 KDE customizations are spread across these forks
 
 https://github.com/kdha200501/libinput
+
+https://github.com/kdha200501/shared-mime-info
 
 https://github.com/kdha200501/kio
 
