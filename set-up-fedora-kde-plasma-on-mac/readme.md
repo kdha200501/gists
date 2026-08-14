@@ -1278,17 +1278,31 @@ Set "Cursor feedback" to `None`
 
 # Customize system sounds
 
+Go to "Colors & Themes" -> "System Sounds" -> "FreeDesktop"
+
+> [!NOTE]
+>
+> The FreeDesktop theme is customized in the fork: [link](https://github.com/kdha200501/xdg-sound-theme)
+>
+
+
+
+##### Install trash sound service
+
 ```shell
-$ mkdir ~/.local/share/sounds
-$ cd ~/.local/share/sounds
-$ git clone https://github.com/lucagoc/MacOSSounds4Gnome.git
+$ pip install PyQt6
+
+$ curl -o- https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/install-trash-sound-service.sh | bash
+
+$ systemctl --user daemon-reload
+$ systemctl --user enable --now trash-sound.service
+$ systemctl --user status trash-sound.service
 ```
 
-Launch "System Settings"
-
-Go to "Colors & Themes" -> "System Sounds"
-
-
+> [!WARNING]
+>
+> The dnf package `python3-pyqt6` does not include QtMultimedia, so the dependency is installed from pip
+>
 
 
 
@@ -1870,6 +1884,8 @@ KDE customizations are spread across these forks
 https://github.com/kdha200501/libinput
 
 https://github.com/kdha200501/shared-mime-info
+
+https://github.com/kdha200501/xdg-sound-theme
 
 https://github.com/kdha200501/kio
 
