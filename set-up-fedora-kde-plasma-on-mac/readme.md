@@ -1254,15 +1254,13 @@ Select "Start with an empty session"
 
 # Customize system sounds
 
-```shell
-$ mkdir ~/.local/share/sounds
-$ cd ~/.local/share/sounds
-$ git clone https://github.com/lucagoc/MacOSSounds4Gnome.git
-```
+Go to "Colors & Themes" -> "System Sounds" -> "FreeDesktop"
 
-Launch "System Settings"
-
-Go to "Colors & Themes" -> "System Sounds"
+> [!NOTE]
+>
+> The FreeDesktop theme is customized in the fork: [link](https://github.com/kdha200501/xdg-sound-theme)
+> 
+>The desktop notifier is customized to play trash sounds (in the FreeDesktop theme) in the fork: [link](https://github.com/kdha200501/plasma-workspace)
 
 
 
@@ -1798,6 +1796,8 @@ KDE customizations are spread across these forks
 https://github.com/kdha200501/libinput
 
 https://github.com/kdha200501/shared-mime-info
+
+https://github.com/kdha200501/xdg-sound-theme
 
 https://github.com/kdha200501/kio
 

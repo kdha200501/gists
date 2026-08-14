@@ -26,6 +26,7 @@ Description:
 
   Supported packages:
     - libinput
+    - xdg-sound-theme (sound-theme-freedesktop)
     - shared-mime-info
     - kio (kf6-kio)
     - dolphin
@@ -365,7 +366,7 @@ set_fork_version() {
 
       return 0
       ;;
-    shared-mime-info)
+    shared-mime-info|xdg-sound-theme)
       local tag="$package_latest_version"
       git -C "$project_dir" fetch --no-tags upstream "refs/tags/$tag:refs/upstream/$tag" &>/dev/null || {
         echo "Error: unable to fetch tag $tag from upstream for $project" >&2
@@ -438,19 +439,20 @@ FEDORA_VERSION="$fedora_version_input"
 
 PACKAGE_JSON=$(cat <<"EOF"
 [
-  { "name": "libinput",             "fork": "git@github.com:kdha200501/libinput.git",             "upstream": "https://gitlab.freedesktop.org/libinput/libinput.git" },
-  { "name": "shared-mime-info",     "fork": "git@github.com:kdha200501/shared-mime-info.git",     "upstream": "https://gitlab.freedesktop.org/xdg/shared-mime-info.git" },
-  { "name": "kf6-kio",              "fork": "git@github.com:kdha200501/kio.git",                  "upstream": "https://github.com/KDE/kio.git" },
-  { "name": "dolphin",              "fork": "git@github.com:kdha200501/dolphin.git",              "upstream": "https://github.com/KDE/dolphin.git" },
-  { "name": "aurorae",              "fork": "git@github.com:kdha200501/aurorae.git",              "upstream": "https://github.com/KDE/aurorae.git" },
-  { "name": "breeze-gtk",           "fork": "git@github.com:kdha200501/breeze.git",               "upstream": "https://github.com/KDE/breeze.git" },
-  { "name": "kscreenlocker",        "fork": "git@github.com:kdha200501/kscreenlocker.git",        "upstream": "https://github.com/KDE/kscreenlocker.git" },
-  { "name": "kwin",                 "fork": "git@github.com:kdha200501/kwin.git",                 "upstream": "https://github.com/KDE/kwin.git" },
-  { "name": "kdeplasma-addons",     "fork": "git@github.com:kdha200501/kdeplasma-addons.git",     "upstream": "https://github.com/KDE/kdeplasma-addons.git" },
-  { "name": "plasma-workspace",     "fork": "git@github.com:kdha200501/plasma-workspace.git",     "upstream": "https://github.com/KDE/plasma-workspace.git" },
-  { "name": "plasma-desktop",       "fork": "git@github.com:kdha200501/plasma-desktop.git",       "upstream": "https://github.com/KDE/plasma-desktop.git" },
-  { "name": "plasma-milou",         "fork": "git@github.com:kdha200501/milou.git",                "upstream": "https://github.com/KDE/milou.git" },
-  { "name": "plasma-login-manager", "fork": "git@github.com:kdha200501/plasma-login-manager.git", "upstream": "https://src.fedoraproject.org/rpms/plasma-login-manager.git" }
+  { "name": "libinput",                "fork": "git@github.com:kdha200501/libinput.git",             "upstream": "https://gitlab.freedesktop.org/libinput/libinput.git" },
+  { "name": "sound-theme-freedesktop", "fork": "git@github.com:kdha200501/xdg-sound-theme.git",      "upstream": "https://gitlab.freedesktop.org/xdg/xdg-sound-theme.git" },
+  { "name": "shared-mime-info",        "fork": "git@github.com:kdha200501/shared-mime-info.git",     "upstream": "https://gitlab.freedesktop.org/xdg/shared-mime-info.git" },
+  { "name": "kf6-kio",                 "fork": "git@github.com:kdha200501/kio.git",                  "upstream": "https://github.com/KDE/kio.git" },
+  { "name": "dolphin",                 "fork": "git@github.com:kdha200501/dolphin.git",              "upstream": "https://github.com/KDE/dolphin.git" },
+  { "name": "aurorae",                 "fork": "git@github.com:kdha200501/aurorae.git",              "upstream": "https://github.com/KDE/aurorae.git" },
+  { "name": "breeze-gtk",              "fork": "git@github.com:kdha200501/breeze.git",               "upstream": "https://github.com/KDE/breeze.git" },
+  { "name": "kscreenlocker",           "fork": "git@github.com:kdha200501/kscreenlocker.git",        "upstream": "https://github.com/KDE/kscreenlocker.git" },
+  { "name": "kwin",                    "fork": "git@github.com:kdha200501/kwin.git",                 "upstream": "https://github.com/KDE/kwin.git" },
+  { "name": "kdeplasma-addons",        "fork": "git@github.com:kdha200501/kdeplasma-addons.git",     "upstream": "https://github.com/KDE/kdeplasma-addons.git" },
+  { "name": "plasma-workspace",        "fork": "git@github.com:kdha200501/plasma-workspace.git",     "upstream": "https://github.com/KDE/plasma-workspace.git" },
+  { "name": "plasma-desktop",          "fork": "git@github.com:kdha200501/plasma-desktop.git",       "upstream": "https://github.com/KDE/plasma-desktop.git" },
+  { "name": "plasma-milou",            "fork": "git@github.com:kdha200501/milou.git",                "upstream": "https://github.com/KDE/milou.git" },
+  { "name": "plasma-login-manager",    "fork": "git@github.com:kdha200501/plasma-login-manager.git", "upstream": "https://src.fedoraproject.org/rpms/plasma-login-manager.git" }
 ]
 EOF
 )
