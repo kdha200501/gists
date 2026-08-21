@@ -1228,6 +1228,32 @@ Copy and paste:
 
 
 
+# Prevent accidental zoom-in/out the entire desktop
+
+Launch "System Settings"
+
+Go to "Accessibility"
+
+Select "Zoom & Magnifier"
+
+Select "Disabled"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Disable desktop session restore
 
 Launch "System Settings"
