@@ -1534,12 +1534,21 @@ Window decoration refers to the window frame
 
 
 
-##### Install a window decoration
+##### Customize window decoration
 
-For example, installing a BeOS decoration
+Choose a window decoration
 
-- Under "System Settings" -> "Colors & Themes" - > "Window Decorations" -> "Get New"
-  - and then apply "Besot Haiku"
+- Under "System Settings" -> "Colors & Themes" -> "Window Decorations" -> "*Platinum*"
+
+> [!NOTE]
+>
+> The *Platinum* window decoration comes from the aurorae fork, see [ref](https://github.com/kdha200501/aurorae)
+
+Customize title bar buttons
+
+- Under "System Settings" -> "Colors & Themes" -> "Window Decorations" -> "Configure Titlebar Buttons"
+  - remove unwanted buttons from title bar and rearrange button positions
+
 
 
 
@@ -1612,39 +1621,6 @@ $ fc-list : family | grep -i monego
 ```
 
 Update terminal profile to use the `Monego` font
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Convert the installed decoration into Mac OS 9
-
-Using assets generously provided by Michael Feeney (ref: [link](https://www.figma.com/community/file/966779730364082883/mac-os-9-ui-kit)), we apply the Mac OS 9 platinum design on top of the BeOS window decoration
-
-```shell
-$ cd ~/.local/share/aurorae/themes
-$ git clone git@github.com:kdha200501/jacks-kde-window-decoration.git
-$ mv besothaiku tmp
-$ mv jacks-kde-window-decoration besothaiku
-$ rm -rf tmp
-```
-
-Customize title bar buttons
-
-- Under "System Settings" -> "Colors & Themes" -> "Window Decorations" -> "Configure Titlebar Buttons"
-  - remove unwanted buttons from title bar and rearrange button positions
 
 
 
