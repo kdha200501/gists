@@ -1327,16 +1327,7 @@ Right click on desktop -> "Enter Edit Mode" -> click on the panel
 
 
 
-# Customize window behaviors
-
-Under "System Settings" -> "Workspace" -> "General Behavior" 
-
-- disable "Display informational tooltips on mouse over"
-
-
-
-##### In *Dolphin*
-
+# Customize Dolphin behaviors
 - right click on empty space the left column -> "Icon Size" -> "Large"
 - go to settings (`⌘` + `,`) -> "View" -> "General"
   - set "Double-click triggers" to "Nothing"
@@ -1745,25 +1736,12 @@ index 7397d11..385c157 100644
 
 # Customize plasma style
 
-Plasma style affects panel
+Under "System Settings" -> "Colors & Themes" -> "Plasma Style" -> "Breeze Dark"
 
-
-
-
-
-##### Install a plasma style
-
-Under "System Settings" -> "Colors & Themes" -> "Plasma Style" -> "Get New"
-
-For example, switching to "Maia Transparent" and then modify menu item hover state to match Mac OS 9
-
-```shell
-$ cd ~/.local/share/plasma/desktoptheme
-$ git clone git@github.com:kdha200501/jacks-kde-plasma-style.git
-$ mv Maia_Transparent/ Maia_Transparent_Bak/
-$ mv jacks-kde-plasma-style/ Maia_Transparent/
-$ rm -rf Maia_Transparent_Bak/
-```
+> [!NOTE]
+>
+> The Breeze Dark plasma style is modified in the libplasma fork, see [ref](https://github.com/kdha200501/libplasma)
+>
 
 
 
@@ -1810,6 +1788,8 @@ https://github.com/kdha200501/plasma-workspace
 https://github.com/kdha200501/plasma-desktop
 
 https://github.com/kdha200501/plasma-milou
+
+https://github.com/kdha200501/libplasma
 
 https://github.com/kdha200501/plasma-login-manager
 
