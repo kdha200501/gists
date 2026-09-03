@@ -25,7 +25,7 @@ Options:
 
 Forked repositories:
   libinput, xdg-sound-theme (sound-theme-freedesktop), shared-mime-info, kio (kf6-kio), dolphin, aurorae, breeze (breeze-gtk), kscreenlocker, kwin,
-  kdeplasma-addons, plasma-workspace, plasma-desktop, plasma-login-manager, milou (plasma-milou)
+  kdeplasma-addons, plasma-workspace, plasma-desktop, plasma-login-manager, milou (plasma-milou), libplasma
 
 Examples:
   $0 -l                            # List all forked repositories
@@ -224,7 +224,8 @@ PACKAGE_JSON=$(cat <<"EOF"
   { "name": "kdeplasma-addons",        "fork": "https://github.com/kdha200501/kdeplasma-addons.git",     "type": "tarball" },
   { "name": "plasma-workspace",        "fork": "https://github.com/kdha200501/plasma-workspace.git",     "type": "tarball" },
   { "name": "plasma-desktop",          "fork": "https://github.com/kdha200501/plasma-desktop.git",       "type": "tarball" },
-  { "name": "plasma-milou",            "fork": "https://github.com/kdha200501/milou.git",                "type": "tarball" }
+  { "name": "plasma-milou",            "fork": "https://github.com/kdha200501/milou.git",                "type": "tarball" },
+  { "name": "libplasma",               "fork": "https://github.com/kdha200501/libplasma.git",            "type": "tarball" }
 ]
 EOF
 )
@@ -431,7 +432,7 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
           }
         }
         ;;
-      aurorae|breeze|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou)
+      aurorae|breeze|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou|libplasma)
         sudo dnf --refresh builddep -y "$package_name" >>"$log_file" 2>&1 || {
           echo "❌ dnf builddep error, see log at $log_file" >>"$log_file" 2>&1
           exit 1
