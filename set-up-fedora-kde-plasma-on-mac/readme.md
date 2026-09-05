@@ -1672,17 +1672,19 @@ $ sudo dnf install kvantum
 
 ##### install a *kvantum* customization
 
-For example, download and unzip the Mac OS 9 (Colors Kvantum) customization from the KDE store, ref: [link](https://store.kde.org/p/1766812)
+```shell
+$ git clone https://github.com/kdha200501/Mac9KvantumClassic.git ~/.config/Kvantum/Mac9KvantumClassic
+```
 
 
 
-Apply the customization through "Kvantum Manager":
+
+
+##### Apply the customization through "Kvantum Manager":
 
 ```shell
 $ kvantummanager
 ```
-
-Under "Install/Update theme", choose "Select a Kvantum theme folder" and "Install this theme"
 
 Under "Change/delete theme", choose "Mac9KvantumClassic"
 
@@ -1691,79 +1693,6 @@ Under "Change/delete theme", choose "Mac9KvantumClassic"
 Choose kvantum as the application style engine:
 
 Go to "System Settings" -> "Colors and Themes" -> "Application Style" -> "kvantum"
-
-
-
-
-
-##### minor improvement to the Mac OS 9 "Colors Kvantum" customization
-
-```shell
-$ atom ~/.config/Kvantum/Mac9KvantumClassic/Mac9KvantumClassic.kvconfig
-```
-
-```diff
-diff --git a/Mac9KvantumClassic.kvconfig b/Mac9KvantumClassic.kvconfig
-index 7397d11..385c157 100644
---- a/Mac9KvantumClassic.kvconfig
-+++ b/Mac9KvantumClassic.kvconfig
-@@ -47,7 +47,7 @@ large_icon_size=32
- layout_margin=4
- layout_spacing=4
- merge_menubar_with_toolbar=false
--respect_DE=true
-+respect_DE=false
- scroll_arrows=true
- scrollbar_in_view=false
- transient_scrollbar=false
-@@ -96,7 +96,7 @@ inactive.window.text.color=black
- button.text.color=black
- disabled.text.color=#00000070
- tooltip.text.color=black
--highlight.text.color=black
-+highlight.text.color=white
- inactive.highlight.text.color=black
- highlight.color=#a6a8c1
- link.color=#0000ff
-@@ -379,16 +379,18 @@ interior.element=iview
- frame.element=iview
- 
- [Menu]
-+inherits=PanelButtonCommand
- frame.top=0
- frame.bottom=0
--frame.left=0
--frame.right=0
-+frame.left=4
-+frame.right=4
- interior.element=mnu
- frame.element=mnu
- frame=true
- interior=true
- 
- [MenuItem]
-+inherits=PanelButtonCommand
- interior=true
- interior.element=menuitem
- frame.expansion=0
-@@ -400,6 +402,8 @@ text.normal.color=black
- text.focus.color=white
- text.margin.top=2
- text.margin.bottom=2
-+text.margin.left=12
-+text.margin.right=5
- 
- [MenuBarItem]
- interior=true
-
-```
-
-> [!NOTE]
->
-> - `respect_DE=false` — disables DE-respecting mode so Kvantum applies the theme's own colors instead of KDE's system colors
-> - `highlight.text.color=white` — fixes unselected text that was unreadable against the highlight background
-> - `[Menu] inherits=PanelButtonCommand` and frame padding of 4px on each side — gives menus proper spacing
-> - `[MenuItem] inherits=PanelButtonCommand` with horizontal text margins (left 12px, right 5px) — aligns menu item text for a more authentic Mac OS 9 look
 
 
 
