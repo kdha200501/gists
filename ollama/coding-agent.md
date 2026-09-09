@@ -83,14 +83,21 @@ Copy and paste:
         "baseURL": "http://192.168.0.23:11434/v1"
       },
       "models": {
-        "qwen3.6:27b": {
-          "name": "qwen3.6:27b"
+        "qwen3.8:27b": {
+          "name": "Qwen3.8:27b",
+          "options": {
+            "keep_alive": -1
+          }
         }
       }
     }
   }
 }
 ```
+
+> [!NOTE]
+>
+> `"keep_alive": -1` prevents the underlying API from asking ollama to reload the model in new session
 
 
 

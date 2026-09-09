@@ -57,7 +57,7 @@ networks:
 
 services:
   ollama:
-    image: ollama/ollama:0.22.1-rocm
+    image: ollama/ollama:0.33.3-rocm
     container_name: ollama-rocm
     restart: unless-stopped
     ports:
@@ -72,11 +72,12 @@ services:
     environment:
       - CUDA_VISIBLE_DEVICES=0
       - OLLAMA_LOAD_TIMEOUT=30m
-      - OLLAMA_KEEP_ALIVE=14400
+      - OLLAMA_KEEP_ALIVE=18h
       - OLLAMA_FLASH_ATTENTION=1
       - OLLAMA_KV_CACHE_TYPE=q4_0
-      - OLLAMA_CONTEXT_LENGTH=32768
+      - OLLAMA_CONTEXT_LENGTH=196608
       - OLLAMA_NUM_PARALLEL=1
+      - GPU_MAX_HW_QUEUES=1
       - OLLAMA_PRESERVE_THINKING=1
       - OLLAMA_SCHED_SPREAD=1
     command: serve
@@ -103,11 +104,12 @@ services:
 > - Ollama Environment Variables:
 >   - `CUDA_VISIBLE_DEVICES`: Specifies which GPU(s) to use (e.g., `0`).
 >   - `OLLAMA_LOAD_TIMEOUT`: Time allowed for model loading (e.g., `30m`). On ROCm/gfx1100, HIP kernel compilation after tensor loading can take 10-30+ minutes for large MoE models, exceeding Ollama's default 5-minute timeout.
->   - `OLLAMA_KEEP_ALIVE`: How long the model stays in memory (e.g., `14400` for 4 hours).
->   - `OLLAMA_FLASH_ATTENTION`: Enables Flash Attention for faster inference.
+>   - `OLLAMA_KEEP_ALIVE`: How long the model stays in memory (e.g., `18h`).
+>   - `OLLAMA_FLASH_ATTENTION`: Enables Flash Attention because it's a prerequisite for KV quantization.
 >   - `OLLAMA_KV_CACHE_TYPE`: Sets the quantization type for the KV cache (e.g., `q4_0`).
->   - `OLLAMA_CONTEXT_LENGTH`: Sets the maximum context window size (e.g. `32768` is about 25,000 words).
+>   - `OLLAMA_CONTEXT_LENGTH`: Sets the maximum context window size (e.g. `196608` is between 130,000 and 150,000 words).
 >   - `OLLAMA_NUM_PARALLEL`: Number of parallel requests the server can handle (e.g., `1` is serial).
+>   - `GPU_MAX_HW_QUEUES`: Number of hardware queue per GPU device. The AMD ROCm runtime to using a single. Restricts ROCm runtime to using a single hardware queue per GPU device prevents the runtime from over-allocating parallel hardware queues, resolving the stuck idle state.
 >   - `OLLAMA_PRESERVE_THINKING`: Ensures thinking process is preserved in the output.
 >   - `OLLAMA_SCHED_SPREAD`: Helps in spreading the workload across available compute units during a spillover.
 
@@ -243,70 +245,15 @@ $ docker rmi <docker-image>
 
 # Pull LLMs
 
-Some models on *Ollama* work with *Claude Code* right out-of-box because their contributors made the effort to calibrate the template for *thinking* and local tool calling like the `gag0/qwen35-opus-distil:27b` model.
-
 ```shell
-$ nohup docker exec ollama-rocm ollama pull gag0/qwen35-opus-distil:27b > $HOME/ollama_pull.log 2>&1 &
-```
-
-
-
-The `glm-4.7-flash` is also great at local tool calling, but thinking is not its strong suit
-
-```shell
-$ nohup docker exec ollama-rocm ollama pull glm-4.7-flash > $HOME/ollama_pull.log 2>&1 &
-```
-
-
-
-Some models work with *Claude Code* out-of-box but suffers infinite loop. Sometimes, these models can be fixed by tuning the parameters through Modelfile. `gemma4:26b` is one such example ref: [link](https://www.kdnuggets.com/local-agentic-programming-on-the-cheap-claude-code-ollama-gemma4)
-
-
-```shell
-$ nohup docker exec ollama-rocm ollama pull gemma4:26b > $HOME/ollama_pull.log 2>&1 &
-```
-
-
-
-```
-FROM gemma4:26b
-PARAMETER num_ctx 131072
-PARAMETER temperature 0.2
-PARAMETER top_p 0.9
-PARAMETER repeat_penalty 1.15
-PARAMETER num_predict 4096
-SYSTEM """You are a senior software engineer operating as a coding agent.
-
-When working with code:
-- Read files before editing them. Never assume file contents.
-- Make one focused change at a time and verify it before proceeding.
-- When a tool call fails, examine the error carefully before retrying.
-  Do not retry with identical parameters. Diagnose first.
-- Prefer surgical edits over full file rewrites.
-- Run tests after each meaningful change, not after a batch of changes.
-- If you are uncertain about the codebase structure, read more files
-  rather than guessing.
-
-Be precise and methodical. Avoid explaining what you are about to do
-when you could simply do it."""
+$ nohup docker exec ollama-rocm ollama pull qwen3.8:27b > $HOME/ollama_pull.log 2>&1 &
 ```
 
 > [!TIP]
 >
-> See the [unsloth/qwen3.6:27bn.md](unsloth-qwen3.6:27bn.md) example for instructions on how to build from a Modelfile
+> See available models at https://ollama.com/library
 
-
-
-
-When a LLM does not work with *Claude Code*, give `OpenCode` a try
-
-```shell
-$ nohup docker exec ollama-rocm ollama pull fredrezones55/Qwopus3.6 > $HOME/ollama_pull.log 2>&1 &
-```
-
-
-
-See available models at https://ollama.com/library
+Find LLM setup example in OpenCode [installation](./coding-agent.md)
 
 
 
