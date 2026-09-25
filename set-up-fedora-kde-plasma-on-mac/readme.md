@@ -359,28 +359,6 @@ $ sudo reboot
 
 
 
-# Turn on number lock upon user log in
-
-Under "System Settings" -> "Keyboard" -> "Keyboard"
-
-- set "NumLock on startup" to "Turn on"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Fix wake from sleep issue
 
 Fedora running on MacBook takes minutes to wake from sleep and some users managed to find log entries that suggest it is the side effect of an unknown CPU core lockup issue (ref: [link](https://discussion.fedoraproject.org/t/disabling-cpu-before-suspend-and-enabling-it-after-wake-up/81890/19))
@@ -1302,8 +1280,6 @@ Right click on desktop -> "Enter Edit Mode" -> click on the panel
 - use full width
 - height: 32
 - disable floating
-- disable top-left corner *CTA* under "System Settings" -> "Display & Monitor" -> "Screen Edges" -> The top left *CTA* -> "No action"
-- disable corner barrier under "System Settings" -> "Display & Monitor" -> "Screen Edges" -> "Corner barrier"
 - display the current application's menu in the panel
   - right click on panel -> "Show Panel Configuration" -> "Add Widgets" -> "Global Menu"
     > [!NOTE]
@@ -1328,16 +1304,9 @@ Right click on desktop -> "Enter Edit Mode" -> click on the panel
 
 
 # Customize Dolphin behaviors
-- right click on empty space the left column -> "Icon Size" -> "Large"
-- go to settings (`⌘` + `,`) -> "View" -> "General"
-  - set "Double-click triggers" to "Nothing"
-  - enable "Open folders during drag operations"
-  - disable "Show selection marker"
+- right click on empty space in the left column -> "Icon Size" -> "Large"
 - go to settings (`⌘` + `,`) -> "Interface" -> "Folders & Tabs" -> "Show on startup"
   - set to home directory
-- go to settings (`⌘` + `,`) -> "Interface" -> "Status & Location bars"
-  - disable "Show zoom slider"
-  - enable "Show full path inside location bar"
 - go to the app menu -> "View"
     - disable "Show previews"
 
