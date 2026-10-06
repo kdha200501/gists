@@ -1653,6 +1653,8 @@ https://github.com/kdha200501/xdg-sound-theme
 
 https://github.com/kdha200501/kio
 
+https://github.com/kdha200501/kio-extras
+
 https://github.com/kdha200501/dolphin
 
 https://github.com/kdha200501/aurorae

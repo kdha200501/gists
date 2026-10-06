@@ -29,6 +29,7 @@ Description:
     - xdg-sound-theme (sound-theme-freedesktop)
     - shared-mime-info
     - kio (kf6-kio)
+    - kio-extras
     - dolphin
     - aurorae
     - breeze (breeze-gtk)
@@ -384,7 +385,7 @@ set_fork_version() {
 
       return 0
       ;;
-      aurorae|breeze|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou|libplasma)
+      aurorae|breeze|dolphin|kio|kio-extras|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou|libplasma)
       local tag="v$package_latest_version"
       git -C "$project_dir" fetch --no-tags upstream "refs/tags/$tag:refs/upstream/$tag" &>/dev/null || {
         echo "Error: unable to fetch tag $tag from upstream for $project" >&2
@@ -444,6 +445,7 @@ PACKAGE_JSON=$(cat <<"EOF"
   { "name": "sound-theme-freedesktop", "fork": "git@github.com:kdha200501/xdg-sound-theme.git",      "upstream": "https://gitlab.freedesktop.org/xdg/xdg-sound-theme.git" },
   { "name": "shared-mime-info",        "fork": "git@github.com:kdha200501/shared-mime-info.git",     "upstream": "https://gitlab.freedesktop.org/xdg/shared-mime-info.git" },
   { "name": "kf6-kio",                 "fork": "git@github.com:kdha200501/kio.git",                  "upstream": "https://github.com/KDE/kio.git" },
+  { "name": "kio-extras",              "fork": "git@github.com:kdha200501/kio-extras.git",           "upstream": "https://github.com/KDE/kio-extras.git" },
   { "name": "dolphin",                 "fork": "git@github.com:kdha200501/dolphin.git",              "upstream": "https://github.com/KDE/dolphin.git" },
   { "name": "aurorae",                 "fork": "git@github.com:kdha200501/aurorae.git",              "upstream": "https://github.com/KDE/aurorae.git" },
   { "name": "breeze-gtk",              "fork": "git@github.com:kdha200501/breeze.git",               "upstream": "https://github.com/KDE/breeze.git" },
