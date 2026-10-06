@@ -24,7 +24,7 @@ Options:
   -C, --cwd PATH      Specify the projects' parent directory (default: current directory)
 
 Forked repositories:
-  libinput, xdg-sound-theme (sound-theme-freedesktop), shared-mime-info, kio (kf6-kio), dolphin, aurorae, breeze (breeze-gtk), kscreenlocker, kwin,
+  libinput, xdg-sound-theme (sound-theme-freedesktop), shared-mime-info, kio (kf6-kio), kio-extras, dolphin, aurorae, breeze (breeze-gtk), kscreenlocker, kwin,
   kdeplasma-addons, plasma-workspace, plasma-desktop, plasma-login-manager, milou (plasma-milou), libplasma
 
 Examples:
@@ -216,6 +216,7 @@ PACKAGE_JSON=$(cat <<"EOF"
   { "name": "sound-theme-freedesktop", "fork": "https://github.com/kdha200501/xdg-sound-theme.git",      "type": "tarball" },
   { "name": "shared-mime-info",        "fork": "https://github.com/kdha200501/shared-mime-info.git",     "type": "tarball" },
   { "name": "kf6-kio",                 "fork": "https://github.com/kdha200501/kio.git",                  "type": "tarball" },
+  { "name": "kio-extras",              "fork": "https://github.com/kdha200501/kio-extras.git",           "type": "tarball" },
   { "name": "dolphin",                 "fork": "https://github.com/kdha200501/dolphin.git",              "type": "tarball" },
   { "name": "aurorae",                 "fork": "https://github.com/kdha200501/aurorae.git",              "type": "tarball" },
   { "name": "breeze-gtk",              "fork": "https://github.com/kdha200501/breeze.git",               "type": "tarball" },
@@ -432,7 +433,7 @@ for package in $(jq -c '.[]' <<< "$PACKAGE_JSON"); do
           }
         }
         ;;
-      aurorae|breeze|dolphin|kio|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou|libplasma)
+      aurorae|breeze|dolphin|kio|kio-extras|kwin|kdeplasma-addons|plasma-workspace|plasma-desktop|kscreenlocker|milou|libplasma)
         sudo dnf --refresh builddep -y "$package_name" >>"$log_file" 2>&1 || {
           echo "❌ dnf builddep error, see log at $log_file" >>"$log_file" 2>&1
           exit 1
