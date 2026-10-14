@@ -877,6 +877,14 @@ left = C-left
 right = C-right
 ```
 
+> [!NOTE]
+>
+> When using the [xwiimote-mouse-driver](https://github.com/kdha200501/xwiimote-mouse-driver)
+> fork (WiiMote as pointing device), append `-057e:0f00` to the `[ids]` section above.
+> The wildcard `*` grabs the driver's virtual pointer and drops its absolute
+> position events, so the cursor stops moving. After editing, run
+> `sudo reboot`.
+
 
 
 ```shell
