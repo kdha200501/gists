@@ -2307,6 +2307,7 @@ alias gbr=:;    complete -F backSpaceNTimes -P '; git ' -W 'branch ' -S ' -r' gb
 alias gc=:;     complete -F backSpaceNTimes -P '; git ' -W 'checkout ' gc
 alias gcb=:;    complete -F backSpaceNTimes -P '; git ' -C printNewBranchCommand -o nospace gcb
 alias gca=:;    complete -F backSpaceNTimes -P '; git ' -W 'commit ' -S ' --amend' gca
+alias gcan=:;   complete -F backSpaceNTimes -P '; git ' -W 'commit ' -S ' --amend --no-edit' gcan
 alias gcf=:;    complete -F backSpaceNTimes -P '; git ' -W 'commit ' -S ' --fixup=' -o nospace gcf
 alias gcm=:;    complete -F backSpaceNTimes -P '; git ' -C printCommitCommand -o nospace gcm
 alias gcam=:;   complete -F backSpaceNTimes -P '; git ' -C printCommitCommand -o nospace gcam
@@ -2330,12 +2331,12 @@ alias gfo=:;    complete -F backSpaceNTimes -P '; git ' -W 'fetch ' -S ' origin'
 alias gfp=:;    complete -F backSpaceNTimes -P '; git ' -W 'fetch ' -S ' --prune' gfp
 
 # custom Angular auto-completes
-alias ngc=:;    complete -F backSpaceNTimes -P '; ng ' -W 'generate ' -S ' component --change-detection=OnPush --skip-tests=true --standalone=false --module=' -o nospace ngc
-alias ngp=:;    complete -F backSpaceNTimes -P '; ng ' -W 'generate ' -S ' pipe --skip-tests=true --standalone=false --module=' -o nospace ngp
+alias ngc=:;    complete -F backSpaceNTimes -P '; ng ' -W 'generate ' -S ' component --change-detection=OnPush --skip-tests=true' -o nospace ngc
+alias ngp=:;    complete -F backSpaceNTimes -P '; ng ' -W 'generate ' -S ' pipe --skip-tests=true' -o nospace ngp
 alias ngm=:;    complete -F backSpaceNTimes -P '; ng ' -W 'generate ' -S ' module' ngm
 alias ngrm=:;    complete -F backSpaceNTimes -P '; ng ' -W 'generate ' -S ' module --routing=true' ngrm
 alias ngs=:;    complete -F backSpaceNTimes -P '; ng ' -W 'generate ' -S ' service --skip-tests=true' ngs
-alias ngd=:;    complete -F backSpaceNTimes -P '; ng ' -W 'generate ' -S ' directive --skip-tests=true --standalone=false --module=' -o nospace ngd
+alias ngd=:;    complete -F backSpaceNTimes -P '; ng ' -W 'generate ' -S ' directive --skip-tests=true' -o nospace ngd
 
 # custom .Net auto-completes
 alias dr=:;     complete -F backSpaceNTimes -P '; dotnet.exe ' -W 'run ' -o nospace dr
@@ -2351,6 +2352,8 @@ __git_complete g __git_main
 alias nginxStart='sudo nginx';
 alias nginxStop='sudo nginx -s stop';
 alias nginxStatic='cd /etc/nginx';
+alias nginxMain='sudo vim /etc/nginx/sites-available/main.conf'
+
 
 ```
 
