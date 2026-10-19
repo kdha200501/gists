@@ -58,11 +58,11 @@ Instructions: [link](https://github.com/kdha200501/imac-cs8409-audio-driver)
 
 > [!TIP]
 >
-> Download [checkout script](checkout.sh) and [agent skill](SKILL.md), use them to create new build source when the Linux kernel is updated through Fedora updates
+> Install [agent skill](../skills/imac-driver-update), and use it to create new installer when the Linux kernel is updated through Fedora updates
 >
 > ```shell
-> $ wget https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/iMac19/SKILL.md
-> $ wget https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/iMac19/checkout.sh
+> $ wget https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/skills/imac-driver-update/SKILL.md
+> $ wget https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/skills/imac-driver-update/checkout.sh
 > $ chmod +x checkout.sh
 > 
 > $ mkdir -p ~/.claude/skills/imac-driver-update

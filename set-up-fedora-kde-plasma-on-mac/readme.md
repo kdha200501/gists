@@ -1713,7 +1713,7 @@ https://github.com/kdha200501/plasma-login-manager
 
 > [!TIP]
 >
-> Download [checkout script](checkout.sh) and [agent skill](SKILL.md), use them to create new build source when Fedora packages are updated
+> Install [agent skill](skills/fedora-update), and use it to create new build source when Fedora packages are updated
 >
 > ```shell
 > $ wget https://github.com/kdha200501/gists/raw/refs/heads/master/set-up-fedora-kde-plasma-on-mac/SKILL.md
