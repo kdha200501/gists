@@ -1337,7 +1337,14 @@ Right click on desktop -> "Enter Edit Mode" -> click on the panel
 
 ##### The background image for the desktop
 
-- under "System Settings" -> "Wallpaper"
+Configure time-of-day wallpaper
+
+> [!NOTE]
+>
+> The dynamic wallpaper in the plasma-workspace fork has been extended to support beyond just light/dark frames, see [ref](https://github.com/kdha200501/plasma-workspace)
+>
+
+- under "System Settings" -> "Wallpaper" -> "Switch dynamic wallpapers" -> "Based on the day-night cycle"
 
 
 
