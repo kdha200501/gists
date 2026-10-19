@@ -39,7 +39,26 @@ Use the value of `fedora_version` for the rest of the skill.
 
 ---
 
-## Step 2 — Run `checkout.sh`
+## Step 2 — Determine the working directory
+
+Ask the user which directory to use as the working directory, presenting the
+following options:
+
+- any directory mentioned in the context (if any)
+- the current working directory at the time the prompt was received
+- the `~/projects` directory
+- a directory provided by the end user
+
+```bash
+read -p "Which directory should I use as the working directory? (default: $(pwd)): " working_directory
+working_directory="${working_directory:-$(pwd)}"
+```
+
+Use the value of `working_directory` for the rest of the skill.
+
+---
+
+## Step 3 — Run `checkout.sh`
 
 Locate `checkout.sh` in this skill's directory:
 
@@ -49,20 +68,18 @@ Locate `checkout.sh` in this skill's directory:
   `~/.claude/skills/imac-driver-update/checkout.sh`, or
   `~/.agents/skills/imac-driver-update/checkout.sh`)
 
-Determine the **current working directory** at the time the prompt was received.
-
-Run the script, passing the current working directory with the `-C` option and
-the target Fedora version with the `-f` option:
+Run the script, passing the working directory (from Step 2) with the `-C`
+option and the target Fedora version with the `-f` option:
 
 ```bash
-<path_to_checkout_sh> -C <current_working_directory> -f <fedora_version>
+<path_to_checkout_sh> -C <working_directory> -f <fedora_version>
 ```
 
 Capture the **complete stdout output** of the script for use in the next step.
 
 ---
 
-## Step 3 — Parse the script output
+## Step 4 — Parse the script output
 
 Scan the captured output for the iMac driver fork that requires cherry-picking. The output is
 structured as one log block per fork:
@@ -98,7 +115,7 @@ For each such fork, extract:
 
 ---
 
-## Step 4 — Ask for confirmation
+## Step 5 — Ask for confirmation
 
 Present the parsed results to the user:
 
@@ -113,7 +130,7 @@ Stop if the user does not confirm.
 
 ---
 
-## Step 5 — Spawn one sub-agent per fork
+## Step 6 — Spawn one sub-agent per fork
 
 For **each** fork that requires cherry-picking, **spawn a separate sub-agent**,
 providing it with the per-fork context and the sub-agent instructions below.
@@ -209,7 +226,7 @@ Commits to cherry-pick (oldest-first after reversing the list):
 
 ---
 
-## Step 6 — Summarize results
+## Step 7 — Summarize results
 
 After all sub-agents complete, present a summary to the user:
 
