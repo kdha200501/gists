@@ -1524,6 +1524,43 @@ Update terminal profile to use the `Monego` font
 
 
 
+##### Enable the terminal bell
+
+- Under *Konsole* -> "Edit Current Profile..." -> "Advanced" -> "Terminal bell mode", choose "System Notifications"
+- Under "System Settings" -> "Notifications" -> "Application Notifications" -> "Konsole" -> "Bell in Focused Session", enable "Play a sound" and use the "bell-window-system" sound
+
+Test with:
+
+```shell
+$ echo -e "\a"
+```
+
+
+> [!NOTE]
+>
+> The "bell-window-system" sound is customized in the fork: [link](https://github.com/kdha200501/xdg-sound-theme)
+> 
+
+The notification audio stream must not be muted
+
+> [!NOTE]
+>
+> *WirePlumber* remembers a mute state for the notification stream group, which makes the bell (and "Preview sound") silent. Look for `"mute":true` in the `Output/Audio:media.role:Notification` entry of `~/.local/state/wireplumber/stream-properties`.
+
+Unmute the stream while the bell is playing, so that *WirePlumber* saves the new state:
+
+```shell
+$ for i in $(seq 1 60); do
+    id=$(pactl list sink-inputs | awk '/^Sink Input/{id=substr($3,2)} /application.name = "Konsole"/{print id; exit}')
+    [ -n "$id" ] && { pactl set-sink-input-mute $id 0; echo "unmuted $id"; break; }
+    sleep 0.05
+  done
+```
+
+Run `echo -e "\a"` in *Konsole* right after starting the loop above (e.g. from a second tab, or use `sleep 1` before it).
+
+
+
 
 
 
